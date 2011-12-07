@@ -1,0 +1,46 @@
+<RCC>
+  <qresource prefix="default">
+    <file>22-skull-n-bones.png</file>
+    <file>arr_down.png</file>
+    <file>arr_left.png</file>
+    <file>arr_right.png</file>
+    <file>arr_up.png</file>
+    <file>cancel.png</file>
+    <file>clear.png</file>
+    <file>cut.png</file>
+    <file>delete.png</file>
+    <file>error.png</file>
+    <file>exit.png</file>
+    <file>filter.png</file>
+    <file>focus.png</file>
+    <file>layout_lm.png</file>
+    <file>layout_lp.png</file>
+    <file>layout_rm.png</file>
+    <file>layout_rp.png</file>
+    <file>lfm_f.png</file>
+    <file>lfm_t.png</file>
+    <file>love_track.png</file>
+    <file>new.png</file>
+    <file>ok.png</file>
+    <file>open.png</file>
+    <file>playback_ff.png</file>
+    <file>playback_next.png</file>
+    <file>playback_pause.png</file>
+    <file>playback_play.png</file>
+    <file>playback_prev.png</file>
+    <file>playback_rew.png</file>
+    <file>playback_stop.png</file>
+    <file>pymp.png</file>
+    <file>random_f.png</file>
+    <file>random_t.png</file>
+    <file>refresh.png</file>
+    <file>repeat_f.png</file>
+    <file>repeat_t.png</file>
+    <file>save.png</file>
+    <file>search.png</file>
+    <file>settings.png</file>
+    <file>shuffle.png</file>
+    <file>speaker.png</file>
+    <file>warning.png</file>
+  </qresource>
+</RCC>
