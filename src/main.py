@@ -104,6 +104,7 @@ class PympSlimView(QtGui.QMainWindow, Ui_PympSlimView):
 
         # tree collection
         self.tree_collection.setContextMenuPolicy(Qt.CustomContextMenu)
+        print self.tree_collection
         self.tree_collection.customContextMenuRequested.connect(self.tree_popup)
         self.tree_collection.clicked.connect(self.tree_clicked)
         self.tree_collection.activated.connect(self.tree_activated)
