@@ -22,6 +22,15 @@ class PympGUI(QtGui.QMainWindow):
         
         self.actions = {}
         self.menuMap = {}
+        
+        self.uistyles = [str(style) for style in QtGui.QStyleFactory.keys()]
+        self.uistyleid = 0
+        QtGui.QApplication.setStyle(QtGui.QStyleFactory.create(self.uistyles[self.uistyleid]))
+        QtGui.QApplication.setPalette(QtGui.QApplication.style().standardPalette())
+        
+        #cssStyle = "padding: 0px;"
+        #self.setStyleSheet(cssStyle)
+        
         self.initUI()
 
     def initUI(self):
@@ -35,7 +44,7 @@ class PympGUI(QtGui.QMainWindow):
                          'exit' :           ['Exit', 'Ctrl+Q', 'Exit Application', QtGui.qApp.quit, 'cancel.png'],
                          'viewCollection' : ['View Collection', 'Ctrl+I', 'View Collection Panel', QtGui.qApp.quit, 'cancel.png'],
                          'viewLyric' :      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', QtGui.qApp.quit, 'cancel.png'],
-                         'lookandfeel' :    ['look and feel', 'Ctrl+F', 'Change look and feel', QtGui.qApp.quit, 'cancel.png'],
+                         'lookandfeel' :    ['look and feel', 'Ctrl+F', 'Change look and feel', self.lookandfeel, 'cancel.png'],
                          'help' :           ['help', 'Ctrl+F', 'help', QtGui.qApp.quit, 'cancel.png'],
                          'about' :          ['about pymp', 'Ctrl+F', 'about', QtGui.qApp.quit, 'cancel.png'],
                          }
@@ -71,6 +80,7 @@ class PympGUI(QtGui.QMainWindow):
         
         mainpanel = QtGui.QWidget(self)
         hbox = QtGui.QHBoxLayout(mainpanel)
+        hbox.setSpacing(0)
         vboxCollection = QtGui.QVBoxLayout(mainpanel)
         vboxCollection.addWidget(searchBarCollection)
         vboxCollection.addWidget(colPanel,1)
@@ -101,6 +111,14 @@ class PympGUI(QtGui.QMainWindow):
         action.setStatusTip(statustip)
         action.triggered.connect(triggeraction)
         return action
+    
+    def lookandfeel(self):
+        if self.uistyleid >= len(self.uistyles)-1:
+            self.uistyleid = 0
+        else:
+            self.uistyleid += 1
+        QtGui.QApplication.setStyle(QtGui.QStyleFactory.create(self.uistyles[self.uistyleid]))
+        QtGui.QApplication.setPalette(QtGui.QApplication.style().standardPalette())
 
 
 class PlaylistPanel(QtGui.QWidget):
@@ -280,13 +298,18 @@ class TrackInfoBar(QtGui.QWidget):
         self.lineTracknr = QtGui.QLabel("tracknr", self)
         self.lineGenre = QtGui.QLabel("genre", self)
         
+        vbox = QtGui.QVBoxLayout(self)
         hbox = QtGui.QHBoxLayout(self)
         hbox.addWidget(self.lineArtist)
         hbox.addWidget(self.lineTitel)
+        vbox.addLayout(hbox)
+        hbox = QtGui.QHBoxLayout(self)
         hbox.addWidget(self.lineAlbum)
         hbox.addWidget(self.lineYear)
         hbox.addWidget(self.lineTracknr)
         hbox.addWidget(self.lineGenre)
+        vbox.addLayout(hbox)
+        
     
     def track(self, artist, title, album, year, tracknr, genre):
         '''
@@ -322,12 +345,12 @@ class SearchBar(QtGui.QWidget):
     def initUI(self):
         ''' TODO: init user interface '''
         pref = '../data/'
-        cssButton = "border-style: flat; border-width: 0px; border-color: black;"
+        #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
         clr = QtGui.QPushButton(QtGui.QIcon(pref + 'cancel.png'), "", self)
         clr.setFocusPolicy(Qt.NoFocus)
         clr.clicked.connect(self.clrSearch)
         clr.setMinimumSize(QSize(32,32))
-        clr.setStyleSheet(cssButton)
+        #clr.setStyleSheet(cssButton)
         
         self.line = QtGui.QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
@@ -368,35 +391,42 @@ class ControlBar(QtGui.QWidget):
         
         #self.setStyleSheet(cssDEBUG)
         
+        sze = QSize(16, 16)
+        
         prev = QtGui.QPushButton(QtGui.QIcon(pref + 'control_rewind.png'), "", self)
         prev.setFocusPolicy(Qt.NoFocus)
         prev.clicked.connect(self.onPrev)
-        prev.setMinimumSize(QSize(32,32))
-        prev.setStyleSheet(cssButton)
+        prev.setMinimumSize(sze)
+        prev.setMaximumSize(sze)
+        #prev.setStyleSheet(cssButton)
         
         stop = QtGui.QPushButton(QtGui.QIcon(pref + 'control_stop.png'), "", self)
         stop.setFocusPolicy(Qt.NoFocus)
         stop.clicked.connect(self.onStop)
-        stop.setMinimumSize(QSize(32,32))
-        stop.setStyleSheet(cssButton)
+        stop.setMinimumSize(sze)
+        stop.setMaximumSize(sze)
+        #stop.setStyleSheet(cssButton)
         
         play = QtGui.QPushButton(QtGui.QIcon(pref + 'control_play.png'), "", self)
         play.setFocusPolicy(Qt.NoFocus)
         play.clicked.connect(self.onPlay)
-        play.setMinimumSize(QSize(32,32))
-        play.setStyleSheet(cssButton)
+        play.setMinimumSize(sze)
+        play.setMaximumSize(sze)
+        #play.setStyleSheet(cssButton)
         
         nxt = QtGui.QPushButton(QtGui.QIcon(pref + 'control_fastforward.png'), "", self)
         nxt.setFocusPolicy(Qt.NoFocus)
         nxt.clicked.connect(self.onNext)
-        nxt.setMinimumSize(QSize(32,32))
-        nxt.setStyleSheet(cssButton)
+        nxt.setMinimumSize(sze)
+        nxt.setMaximumSize(sze)
+        #nxt.setStyleSheet(cssButton)
         
         mute = QtGui.QPushButton(QtGui.QIcon(pref + 'mute.png'), "", self)
         mute.setFocusPolicy(Qt.NoFocus)
         mute.clicked.connect(self.onMute)
-        mute.setMinimumSize(QSize(32,32))
-        mute.setStyleSheet(cssButton)
+        mute.setMinimumSize(sze)
+        mute.setMaximumSize(sze)
+        #mute.setStyleSheet(cssButton)
         
         sldVol = QtGui.QSlider(Qt.Horizontal, self)
         sldVol.setFocusPolicy(Qt.NoFocus)
@@ -411,8 +441,8 @@ class ControlBar(QtGui.QWidget):
         tremain = QtGui.QLabel("23:59", self)
         
         hbox = QtGui.QHBoxLayout(self)
-        hbox.addWidget(prev)
-        hbox.addWidget(stop)
+        hbox.addWidget(prev, 0)
+        hbox.addWidget(stop, 0)
         hbox.addWidget(play)
         hbox.addWidget(nxt)
         hbox.addWidget(mute)
@@ -494,7 +524,7 @@ class ID3Edit(QtGui.QDialog):
             hbox.addWidget(lbl)
             hbox.addWidget(line, 1)
             vbox.addLayout(hbox)
-        
+            
         hbox = QtGui.QHBoxLayout(self)
         ok = QtGui.QPushButton(QtGui.QIcon('../data/iconsets/default/ok.png'), "", self)
         ok.clicked.connect(self.onOk)
@@ -503,7 +533,8 @@ class ID3Edit(QtGui.QDialog):
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
         vbox.addLayout(hbox)
-        self.setLayout(vbox)
+        
+        #self.setLayout(vbox)
         self.setWindowTitle('ID3 Editor')
         self.resize(300, 800)
     
