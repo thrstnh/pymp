@@ -61,10 +61,20 @@ class PympGUI(QtGui.QMainWindow):
         self.setGeometry(20, 20, 820, 620)
         self.setWindowTitle('pymp')
         
-        #vbox = QtGui.QVBoxLayout()
-        self.controlBar = ControlBar(self)
-        #self.setLayout(vbox)
         
+        self.controlBar = ControlBar(self)
+        self.searchBarCollection = SearchBar(self)
+        self.searchBarPlaylist = SearchBar(self)
+        
+        mainpanel = QtGui.QWidget(self)
+        
+        vbox = QtGui.QVBoxLayout()
+        vbox.addWidget(self.controlBar)
+        vbox.addWidget(self.searchBarCollection)
+        vbox.addWidget(self.searchBarPlaylist)
+        
+        self.setCentralWidget(mainpanel)
+        mainpanel.setLayout(vbox)
         self.show()
     
 
@@ -75,6 +85,41 @@ class PympGUI(QtGui.QMainWindow):
         action.setStatusTip(statustip)
         action.triggered.connect(triggeraction)
         return action
+
+class SearchBar(QtGui.QWidget):
+    '''
+        Control Panel for search patterns
+    '''
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.initUI()
+    def initUI(self):
+        ''' TODO: init user interface '''
+        pref = '../data/'
+        cssButton = "border-style: flat; border-width: 0px; border-color: black;"
+        clr = QtGui.QPushButton(QtGui.QIcon(pref + 'cancel.png'), "", self)
+        clr.setFocusPolicy(Qt.NoFocus)
+        clr.clicked.connect(self.clrSearch)
+        clr.setMinimumSize(QSize(32,32))
+        clr.setStyleSheet(cssButton)
+        
+        line = QtGui.QLineEdit('search', self)
+        line.textChanged.connect(self.txChanged)
+        line.returnPressed.connect(self.txReturn)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        hbox.addWidget(clr)
+        hbox.addWidget(line)
+    
+    def txChanged(self, t):
+        print "txChanged ", t
+    
+    def txReturn(self):
+        print "txReturn "
+    
+    def clrSearch(self):
+        ''' TODO: pressed clrSearch'''
+        print "pressed clrSearch"
 
 
 class ControlBar(QtGui.QWidget):
@@ -91,9 +136,9 @@ class ControlBar(QtGui.QWidget):
         cssButton = "border-style: flat; border-width: 0px; border-color: black;"
         cssDEBUG = "background-color: black; border-style: flat; border-width: 0px; border-color: black;"
         
-        cssButton = cssDEBUG
+        #cssButton = cssDEBUG
         
-        self.setStyleSheet(cssDEBUG)
+        #self.setStyleSheet(cssDEBUG)
         
         prev = QtGui.QPushButton(QtGui.QIcon(pref + 'control_rewind.png'), "", self)
         prev.setFocusPolicy(Qt.NoFocus)
@@ -125,28 +170,28 @@ class ControlBar(QtGui.QWidget):
         mute.setMinimumSize(QSize(32,32))
         mute.setStyleSheet(cssButton)
         
-        sld = QtGui.QSlider(Qt.Horizontal, self)
-        sld.setFocusPolicy(Qt.NoFocus)
-        sld.setGeometry(30, 40, 100, 30)
-        sld.valueChanged[int].connect(self.changeValue)
+        sldVol = QtGui.QSlider(Qt.Horizontal, self)
+        sldVol.setFocusPolicy(Qt.NoFocus)
+        sldVol.valueChanged[int].connect(self.volChangeValue)
+        
+        tstart = QtGui.QLabel("00:00", self)
+        
+        sldTime = QtGui.QSlider(Qt.Horizontal, self)
+        sldTime.setFocusPolicy(Qt.NoFocus)
+        sldTime.valueChanged[int].connect(self.timeChangeValue)
+        
+        tremain = QtGui.QLabel("23:59", self)
         
         hbox = QtGui.QHBoxLayout(self)
-        #hbox.addStretch(1)
         hbox.addWidget(prev)
         hbox.addWidget(stop)
         hbox.addWidget(play)
-        #self.layout().addWidget(play)
         hbox.addWidget(next)
         hbox.addWidget(mute)
-        hbox.addWidget(sld)
-        
-        #vbox = QtGui.QVBoxLayout(self)
-        #vbox.addStretch(1)
-        #vbox.addLayout(hbox)
-        #self.setLayout(hbox)
-        #self.setPalette(QtGui.QPalette(QtGui.QPalette.Background, Qt.black))
-               
-        self.setGeometry(100, 100, 130+5*40, 40)
+        hbox.addWidget(sldVol)
+        hbox.addWidget(tstart)
+        hbox.addWidget(sldTime)
+        hbox.addWidget(tremain)
     
     def onPrev(self):
         ''' TODO: pressed prev'''
@@ -168,7 +213,7 @@ class ControlBar(QtGui.QWidget):
         ''' TODO: pressed mute'''
         print "pressed mute"
         
-    def changeValue(self, value):
+    def volChangeValue(self, value):
         ''' TODO: slider changed value'''
         print 'volume ',
         if value == 0:
@@ -177,7 +222,17 @@ class ControlBar(QtGui.QWidget):
             print "max"
         else:
             print value
-
+    
+    def timeChangeValue(self, value):
+        ''' TODO: slider changed value'''
+        print 'time ',
+        if value == 0:
+            print "muted"
+        elif value == 99:
+            print "max"
+        else:
+            print value
+        
     def paintEvent(self, event):
         qp = QtGui.QPainter()
         qp.begin(self)
