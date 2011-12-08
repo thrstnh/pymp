@@ -10,6 +10,7 @@ from PyQt4.QtCore import Qt, QSize, QTimer
 from PyQt4 import QtGui
 from tree_model import myModel
 from table_model import MyTableModel
+from pymp.mp3 import PMP3
 
 
 class PympGUI(QtGui.QMainWindow):
@@ -87,6 +88,9 @@ class PympGUI(QtGui.QMainWindow):
         mainpanel.setLayout(hbox)
         
         trackInfo.track("Skindred", "Stand for Something", "Shark Bites and Dog Fights", "2009", "01", "Reggae-Metal")
+        
+        id3dlg = ID3Edit(self, '../skindred/01 - Stand For Something.mp3')
+        id3dlg.show()
         self.show()
     
     def qtregister_action(self, name, shortcut, statustip, triggeraction, image):
@@ -102,6 +106,10 @@ class PympGUI(QtGui.QMainWindow):
 class PlaylistPanel(QtGui.QWidget):
     '''
         Playlist Table
+        
+        click
+        dclick
+        
     '''
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -110,8 +118,8 @@ class PlaylistPanel(QtGui.QWidget):
     def initUI(self):
         ''' TODO: init user interface '''
         self.tbl = QtGui.QTableView(self)
-        self.tm = MyTableModel()
-        self.tbl.setModel(self.tm)
+        self.model = MyTableModel()
+        self.tbl.setModel(self.model)
 
         self.tbl.setShowGrid(False)
 
@@ -122,7 +130,7 @@ class PlaylistPanel(QtGui.QWidget):
         hh.setStretchLastSection(True)
 
         self.tbl.setColumnHidden(0, True)
-        self.tbl.setColumnHidden(self.tm.column_length()-1, True)
+        self.tbl.setColumnHidden(self.model.column_length()-1, True)
         
         vbox = QtGui.QHBoxLayout(self)
         vbox.addWidget(self.tbl, 1)
@@ -132,18 +140,26 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.entered.connect(self.entered)
         self.tbl.pressed.connect(self.pressed)
     
-    def clicked(self):
-        print "playlist::clicked"
+    def clicked(self, idx):
+        print 'playlist_clicked: ', idx
+        data = self.model.data_row(idx.row())
+        self.current_path = '%s' % data[len(data)-1]
+        #print "current_path: ", type(self.current_path)
+        
     def double_clicked(self):
-        print "playlist::clicked"
+        print "playlist::double_clicked"
+        raise NotImplementedError
     def activated(self):
-        print "playlist::clicked"
+        print "playlist::activated"
+        raise NotImplementedError
     def entered(self):
-        print "playlist::clicked"
+        print "playlist::entered"
+        raise NotImplementedError
     def pressed(self):
-        print "playlist::clicked"
+        print "playlist::pressed"
+        raise NotImplementedError
     def append(self, item):
-        self.tm.append(item)
+        self.model.append(item)
 
 
 class CollectionPanel(QtGui.QWidget):
@@ -169,7 +185,7 @@ class CollectionPanel(QtGui.QWidget):
         self.tre.setColumnWidth(0, 200)
         self.tre.setColumnWidth(1, 90)
         self.tre.setColumnWidth(2, 100)
-        self.tre.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        #self.tre.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tre.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tre.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tre.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -184,12 +200,20 @@ class CollectionPanel(QtGui.QWidget):
         vbox.addWidget(self.tre, 1)
     
     def _dclick_timeout(self):
+        '''
+            called on timeout for double click timer
+        '''
         print "single click"
         index = self.idx
         self.tre.setExpanded(index, not self.tre.isExpanded(index))
         self._dclick_timer.stop()
                         
     def clicked(self, index):
+        '''
+            start a double click timer for 300ms.
+            if dclick: fill playlist with node-children
+            if singleclick: open tree node
+        '''
         self.idx = index
         if self._dclick_timer.isActive():
             self._dclick_timer.stop()
@@ -202,6 +226,9 @@ class CollectionPanel(QtGui.QWidget):
             self._dclick_timer.start(300)
             
     def _add_child_nodes(self, node):
+        '''
+            append list children to playlist recursively
+        '''
         if node.hasChildren():
             for child in node.children:
                 if isinstance(child.data, list):
@@ -211,8 +238,10 @@ class CollectionPanel(QtGui.QWidget):
 
     def activated(self):
         print "activated"
+        raise NotImplementedError
     def pressed(self):
         print "pressed"
+        raise NotImplementedError
     def popup(self, point):
         mindex = self.tre.indexAt(point)
         self.node = self.model.nodeFromIndex(mindex)
@@ -260,6 +289,9 @@ class TrackInfoBar(QtGui.QWidget):
         hbox.addWidget(self.lineGenre)
     
     def track(self, artist, title, album, year, tracknr, genre):
+        '''
+            fill fields with data
+        '''
         self.artist = artist
         self.title = title
         self.album = album
@@ -269,6 +301,9 @@ class TrackInfoBar(QtGui.QWidget):
         self.updateInformation()
     
     def updateInformation(self):
+        '''
+            sync vars with gui-labels
+        '''
         self.lineArtist.setText(self.artist)
         self.lineTitel.setText(self.title)
         self.lineAlbum.setText(self.album)
@@ -304,12 +339,14 @@ class SearchBar(QtGui.QWidget):
     
     def txChanged(self, t):
         print "txChanged ", t
+        raise NotImplementedError
     
     def txReturn(self):
         print "pattern: ", self.line.text()
+        raise NotImplementedError
     
     def clrSearch(self):
-        ''' TODO: pressed clrSearch'''
+        ''' clear search '''
         self.line.setText('')
 
 
@@ -387,22 +424,27 @@ class ControlBar(QtGui.QWidget):
     def onPrev(self):
         ''' TODO: pressed prev'''
         print "pressed prev"
+        raise NotImplementedError
         
     def onStop(self):
         ''' TODO: pressed stop'''
         print "pressed stop"
+        raise NotImplementedError
         
     def onPlay(self):
         ''' TODO: pressed play'''
         print "pressed play"
+        raise NotImplementedError
         
     def onNext(self):
         ''' TODO: pressed next'''
         print "pressed next"
+        raise NotImplementedError
         
     def onMute(self):
         ''' TODO: pressed mute'''
         print "pressed mute"
+        raise NotImplementedError
         
     def volChangeValue(self, value):
         ''' TODO: slider changed value'''
@@ -430,8 +472,61 @@ class ControlBar(QtGui.QWidget):
         #rect = QRect(0, 0, self.width(), self.height())
         #qp.drawText(rect, Qt.AlignCenter, "self.text()")
         qp.end()
+
+
+class ID3Edit(QtGui.QDialog):
+    '''
+        ID3 Tag Editor
+    '''
+    def __init__(self, parent=None, fp=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.fp = fp
+        self.data = self.load(self.fp)        
+        self.initUI()
+        
+    def initUI(self):
+        print self.data
+        vbox = QtGui.QVBoxLayout(self)
+        for (k,v) in self.data.items():
+            hbox = QtGui.QHBoxLayout(self)
+            lbl = QtGui.QLabel(str(k), self)
+            line = QtGui.QLineEdit(str(v), self)
+            hbox.addWidget(lbl)
+            hbox.addWidget(line, 1)
+            vbox.addLayout(hbox)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        ok = QtGui.QPushButton(QtGui.QIcon('../data/iconsets/default/ok.png'), "", self)
+        ok.clicked.connect(self.onOk)
+        cancel = QtGui.QPushButton(QtGui.QIcon('../data/cancel.png'), "", self)
+        cancel.clicked.connect(self.onCancel)
+        hbox.addWidget(ok)
+        hbox.addWidget(cancel)
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+        self.setWindowTitle('ID3 Editor')
+        self.resize(300, 800)
+    
+    def load(self, fp):
+        '''
+            load mp3 id3 meta data from file as dict
+        '''
+        return PMP3(fp).all()
+    
+    def onOk(self):
+        ''' exit dialog with ok'''
+        print "ok"
+        self.close()
+    
+    def onCancel(self):
+        ''' exit dialog with cancel '''
+        print "cancel"
+        self.close()
         
 def show_msg(self, msg):
+    '''
+        simple message box
+    '''
     msgbox = QtGui.QMessageBox()
     msgbox.setText(msg)
     msgbox.exec_()
