@@ -177,12 +177,10 @@ class PympGUI(QtGui.QMainWindow):
         trackInfo.track("Skindred", "Stand for Something", "Shark Bites and Dog Fights", "2009", "01", "Reggae-Metal")
         lyricPanel.search("Skindred", "Stand for Something")
         
-        #id3dlg = ID3Edit(self, '../skindred/01 - Stand For Something.mp3')
-        #id3dlg.show()
         self.show()
     
     def defAction(self):
-        print "TODO"
+        print "TODO: default action"
         raise NotImplementedError
     
     def qtregister_action(self, name, shortcut, statustip, triggeraction, image):
@@ -364,27 +362,44 @@ class LyricPanel(QtGui.QWidget):
     def __init__(self, parent=None):
         ''' TODO: init user interface '''
         QtGui.QWidget.__init__(self, parent)
+        self.artist = ''
+        self.track = ''
         self.initUI()
     
     def initUI(self):
+        ''' init user interface '''
+        self.lblTrackInfo = QtGui.QLabel('')
         self.txt = QtGui.QTextEdit(self)
         self.txt.setReadOnly(True)
         vbox = QtGui.QVBoxLayout(self)
-        vbox.addWidget(self.txt)
+        vbox.addWidget(self.lblTrackInfo)
+        vbox.addWidget(self.txt, 1)
          
     def search(self, artist, track):
-        monkey = LyricWorker("Skindred", "Stand for Something")
-        self.connect(monkey, QtCore.SIGNAL('update(QString)'), self.txt, QtCore.SIGNAL('setText(QString)'))
-        #monkey.start()
+        ''' search a lyrics with a thread '''
+        self.artist = artist
+        self.track = track
+        self.monkey = LyricWorker(self, "Skindred", "Stand for Something")
+        self.monkey.lyricFetched.connect(self.lyricChanged)
     
-    #@pyqtSlot('QString')
     def lyricChanged(self, lyr):
-        print "called lyricChanged"
+        ''' change label and textedit '''
+        self.lblTrackInfo.setText('%s - %s' % (self.artist, self.track))
         self.txt.setText(lyr)
+        
+    def showEvent(self, arg1):
+        ''' show user interface '''
+        self.monkey.start()        
 
 
 class LyricWorker(QtCore.QThread):
-    def __init__(self, artist, title):
+    '''
+        Fetch Lyrics from LyricsWiki
+    '''
+    # signal called after lyrics fetched
+    lyricFetched = QtCore.pyqtSignal(QtCore.QString)
+    
+    def __init__(self, parent, artist, title):
         QtCore.QThread.__init__(self)
         self.artist = artist
         self.title = title
@@ -402,12 +417,15 @@ class LyricWorker(QtCore.QThread):
             print "worker got only: %s - %s" % (self.artist, self.title)
         if lyr:
             print "Lyric: ", lyr
-            #self.emit(QtCore.SIGNAL('update(QString)'), lyr)
+            self.lyricFetched.emit(lyr)
         else:
             print "QThread filed?..."
         return
     
     def _read(self):
+        '''
+            read lyrics from lyric-dir
+        '''
         fp = os.path.join(PYMPCFG[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
         try:
             with open(fp, 'r') as f:
@@ -418,6 +436,9 @@ class LyricWorker(QtCore.QThread):
         return ''
 
     def _save(self, lyr):
+        '''
+            save lyrics to lyric-dir for offline lyrics
+        '''
         fp = os.path.join(PYMPCFG[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
         with open(fp, 'w') as f:
             f.write(lyr.encode('utf-8'))
