@@ -91,7 +91,7 @@ class MyTableModel(QAbstractTableModel):
         self.emit(SIGNAL("layoutChanged()"))
 #        print "arraydata: ", self.arraydata
 
-    def next(self):
+    def nxt(self):
         n = randint(0, self.row_length())
         return n
 
@@ -107,7 +107,7 @@ class MyTableModel(QAbstractTableModel):
         if self.arraydata:
             return len(self.arraydata[0])
         return 0
-
+    
     def row_length(self):
         return len(self.arraydata)
 
@@ -121,6 +121,9 @@ class MyTableModel(QAbstractTableModel):
 
     def data_row(self, row):
         return self.arraydata[row]
+    
+    def data_at(self, row, col):
+        return QVariant(self.arraydata[row][col])
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:

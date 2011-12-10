@@ -12,7 +12,7 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 from PyQt4.phonon import Phonon
 from tree_model import myModel
-from table_model import MyTableModel
+from table_model import MyTableModel, myQTableView
 from pymp.mp3 import PMP3
 from pymp.config import cfg as PYMPCFG, LYRICS_DIR
 import lyricwiki
@@ -77,7 +77,6 @@ class PympGUI(QtGui.QMainWindow):
         super(PympGUI, self).__init__()
         
         self.actions = {}
-        self.menuMap = {}
         
         self.uistyles = [str(style) for style in QtGui.QStyleFactory.keys()]
         self.uistyleid = 0
@@ -110,7 +109,7 @@ class PympGUI(QtGui.QMainWindow):
                          'viewLyric' :      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', QtGui.qApp.quit, iconset['cancel']],
                          # ctrl actions
                          'playback_ff' :    ['FF', 'Ctrl+Q', 'Forward', QtGui.qApp.quit, iconset['playback_ff']],
-                         'playback_next' :  ['Next', 'Ctrl+Q', 'Next Track', QtGui.qApp.quit, iconset['playback_next']],
+                         'playback_next' :  ['Next', 'Ctrl+Q', 'Next Track', self.plsPanel.nextPath, iconset['playback_next']],
                          'playback_pause' : ['Pause', 'Ctrl+Q', 'Pause', QtGui.qApp.quit, iconset['playback_pause']],
                          'playback_play' :  ['Play', 'Ctrl+Q', 'Play', QtGui.qApp.quit, iconset['playback_play']],
                          'playback_prev' :  ['Prev', 'Ctrl+Q', 'Prev', QtGui.qApp.quit, iconset['playback_prev']],
@@ -209,10 +208,17 @@ class PympGUI(QtGui.QMainWindow):
         self.controlBar.onTime.connect(self.player.time)
         self.plsPanel.playCurrent.connect(self.player.play)
         self.plsPanel.playCurrent.connect(self.trackInfo.track)
+        self.plsPanel.playNext.connect(self.player.play)
+        self.plsPanel.playNext.connect(self.trackInfo.track)
         self.player.timeStart.connect(self.controlBar.setTimeStart)
         self.player.timeTotal.connect(self.controlBar.setTimeTotal)
+        self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
-    
+        self.searchBarPlaylist.timerExpired.connect(self.plsPanel.usePattern)
+        #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
+        #self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
+        
+        
 
 class PlaylistPanel(QtGui.QWidget):
     '''
@@ -224,14 +230,17 @@ class PlaylistPanel(QtGui.QWidget):
     '''
     # send signal on double click
     playCurrent = QtCore.pyqtSignal(QtCore.QString)
+    playNext = QtCore.pyqtSignal(QtCore.QString)
     
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.initUI()
+        # current tracks
+        self.tracks = {}
     
     def initUI(self):
         ''' TODO: init user interface '''
-        self.tbl = QtGui.QTableView(self)
+        self.tbl = myQTableView(self) #QtGui.QTableView(self)
         self.model = MyTableModel()
         self.tbl.setModel(self.model)
         self.tbl.setShowGrid(False)
@@ -242,23 +251,119 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tbl.setSortingEnabled(True)
         self.tbl.setWordWrap(False)
+        #self.tbl.setRowHeight()
+        self.tbl.resizeRowsToContents()
         vh = self.tbl.verticalHeader()
         vh.setVisible(False)
+        vh.setDefaultSectionSize(14)
         hh = self.tbl.horizontalHeader()
         hh.setStretchLastSection(True)
         
-        vbox = QtGui.QHBoxLayout(self)
-        vbox.addWidget(self.tbl, 1)
+        self.toolbar = QtGui.QToolBar('Clear Playlist')
+        ac = QtGui.QAction(QtGui.QIcon(iconset['clear']), "Clear Playlist", self)
+        ac.setStatusTip("Clear Playlist")
+        ac.triggered.connect(self.clearPlaylist)
+        self.toolbar.addAction(ac)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        hbox.addWidget(self.tbl, 1)
+        hbox.addWidget(self.toolbar)
+        
+        #vbox = QtGui.QVBoxLayout(self)
+        
 #        self.tbl.clicked.connect(self.clicked)
         self.tbl.doubleClicked.connect(self.double_clicked)
 #        self.tbl.activated.connect(self.activated)
 #        self.tbl.entered.connect(self.entered)
 #        self.tbl.pressed.connect(self.pressed)
+
+    def clearPlaylist(self):
+        pass
     
+    def usePattern(self, pattern):
+        print "rows: ", self.model.row_length()
+        print "cols: ", self.model.column_length()
+        
+        
+        if not pattern:
+            [self.appendModel(item) for (k, item) in self.tracks.items()] 
+        else:
+            pattern = str(pattern).lower().split()
+            match = False
+            self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+            self.model.clear()
+            self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+            for (k, v) in self.tracks.items():
+                if self.__valid_entry(v, map(str.strip, pattern)):
+                    self.appendModel(v)
+                    self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+                    continue
+                
+        print "usePattern finished"
+        print "rows: ", self.model.row_length()
+        print "cols: ", self.model.column_length()
+        self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+    
+    def __valid_entry(self, item, pattern=[]):
+        # mode: or
+        mor = True if 'or' in pattern else False
+        # mode: and
+        mand = True if 'and' in pattern else False
+        if mor:
+            while pattern.count('or') > 0:
+                pattern.remove('or')
+        if mand:
+            while pattern.count('and') > 0:
+                pattern.remove('and')
+        br = []
+        for p in pattern:
+            p = p.strip()
+            b0 = b1 = b2 = b3 = False
+            #if item[-1]: # path
+            #    if p in item[-1].lower():
+            #        b0 = True
+            if item[1]: # title
+                if p in item[1].lower():
+                    b1 = True
+            if item[2]: # artist
+                if p in item[2].lower():
+                    b2 = True
+            if item[3]: # album
+                if p in item[3].lower():
+                    b3 = True
+            br.append(any([b0, b1, b2, b3]))
+
+        if len(pattern) == 2 or mor:
+            return any(br)
+        return all(br)
+#        QString filter = textEdit->text();
+#for( int i = 0; i < table->rowCount(); ++i )
+#{
+#    bool match = false;
+#    for( int j = 0; j < table->columnCount(); ++j )
+#    {
+#        QTableWidgetItem *item = table->item( i, j );
+#        if( item->text().contains(filter) )
+#        {
+#            match = true;
+#            break;
+#        }
+#    }
+#    table->setRowHidden( i, !match );
+#}
+
     def getPath(self, idx):
         ''' get current path from QModelIndex '''
         data = self.model.data_row(idx.row())
         cpath = QtCore.QString(data[len(data)-1])
+        return cpath
+    
+    def nextPath(self):
+        row = self.model.next()
+        self.tbl.selectRow(row)
+        data = self.model.data_row(row)
+        cpath = QtCore.QString(data[len(data)-1])
+        self.playNext.emit(cpath)
         return cpath
     
 #    def clicked(self, idx):
@@ -283,7 +388,12 @@ class PlaylistPanel(QtGui.QWidget):
 #        print "playlist::pressed ", val1, val2
 #        raise NotImplementedError
     def append(self, item):
+        self.tracks[item[-1]] = item
         self.model.append(item)
+    
+    def appendModel(self, item):
+        self.model.append(item)
+        
 
 
 class CollectionPanel(QtGui.QWidget):
@@ -532,9 +642,15 @@ class SearchBar(QtGui.QWidget):
     '''
         Control Panel for search patterns
     '''
+    search = QtCore.pyqtSignal(QtCore.QString)
+    clearSearch = QtCore.pyqtSignal(QtCore.QString)
+    timerExpired = QtCore.pyqtSignal(QtCore.QString)
+    
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        self._search_timer = QtCore.QTimer(self)
         self.initUI()
+        
     def initUI(self):
         ''' TODO: init user interface '''
         #pref = '../data/'
@@ -542,8 +658,11 @@ class SearchBar(QtGui.QWidget):
         clr = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
         clr.setFocusPolicy(QtCore.Qt.NoFocus)
         clr.clicked.connect(self.clrSearch)
-        clr.setMinimumSize(QtCore.QSize(32,32))
+        clr.setMinimumSize(QtCore.QSize(16,16))
+        clr.setMaximumSize(QtCore.QSize(16,16))
         #clr.setStyleSheet(cssButton)
+        
+        self._search_timer.timeout.connect(self.searchTimeout)
         
         self.line = QtGui.QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
@@ -554,16 +673,31 @@ class SearchBar(QtGui.QWidget):
         hbox.addWidget(self.line, 1)
     
     def txChanged(self, t):
-        print "txChanged ", t
-        raise NotImplementedError
+        self.pattern = self.line.text()
+        self.search.emit(self.pattern)
+        
+        '''
+            start a double click timer for 300ms.
+            if dclick: fill playlist with node-children
+            if singleclick: open tree node
+        '''
+        if self._search_timer.isActive():
+            self._search_timer.stop()
+        self._search_timer.start(1000)
     
     def txReturn(self):
-        print "pattern: ", self.line.text()
-        raise NotImplementedError
+        self.search.emit(self.pattern)
+        #self.pattern = self.line.text()
+        #self.search.emit(self.pattern)
     
     def clrSearch(self):
         ''' clear search '''
         self.line.setText('')
+        self.clearSearch.emit('')
+    
+    def searchTimeout(self):
+        self._search_timer.stop()
+        self.timerExpired.emit(self.pattern)
 
 
 class ControlBar(QtGui.QWidget):
@@ -747,6 +881,8 @@ class PlayerPhonon(QtCore.QObject):
     # tick for player
     timeStart = QtCore.pyqtSignal(QtCore.QString)
     timeTotal = QtCore.pyqtSignal(QtCore.QString)
+    timeScratched = QtCore.pyqtSignal(int)
+    volScratched = QtCore.pyqtSignal(int)
     
     def __init__(self, parent):
         QtCore.QObject.__init__(self, parent)
@@ -785,29 +921,29 @@ class PlayerPhonon(QtCore.QObject):
     def repeat(self):
         print "Player::repeat"
         
-    def volume(self, value):
+    def volume(self, val):
         ''' TODO: slider changed value'''
-        print 'volume ',
-        if value == 0:
-            print "muted"
-        elif value == 99:
-            print "max"
-        else:
-            print value
+        val = float(val) / 100.
+        #print dir(self.m_audio)
+        self.m_audio.setVolume(val)
+        self.volScratched.emit(val)
             
-    def time(self, value):
+    def time(self, val):
         ''' TODO: slider changed value'''
-        print 'time ',
-        if value == 0:
-            print "muted"
-        elif value == 99:
-            print "max"
+        if self.player and self.player.state() == Phonon.PlayingState:
+            seek = (val * self.player.totalTime()) / 100
+            self.player.seek(seek)
+            self.timeScratched.emit(seek)
         else:
-            print value
+            print "not playing... ", time
             
     def tick(self, time):
         ''' tick timer for player updates'''
         #print "Player::tick: ", time
+        self._updateLabels()
+
+    
+    def _updateLabels(self):
         cur_s = 0
         total_s = 0
         if self.player and self.player.state() == Phonon.PlayingState:
@@ -815,6 +951,7 @@ class PlayerPhonon(QtCore.QObject):
             self.timeStart.emit(handle_time(cur_s))
             total_s = self.player.totalTime() / 1000.
             self.timeTotal.emit(handle_time(total_s))
+        
 
     def finished(self):
         print "Player::finished"
