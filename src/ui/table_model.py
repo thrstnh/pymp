@@ -92,7 +92,7 @@ class MyTableModel(QAbstractTableModel):
 #        print "arraydata: ", self.arraydata
 
     def nxt(self):
-        n = randint(0, self.row_length())
+        n = randint(0, self.row_length()-1)
         return n
 
     def rowCount(self, parent):

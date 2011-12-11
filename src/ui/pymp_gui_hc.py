@@ -68,7 +68,6 @@ iconset = {
            "lookandfeel" : os.path.join(pref + 'warning.png'),
            }
 
-
 class PympGUI(QtGui.QMainWindow):
     '''
         MainWindow of the python music player (pymp)
@@ -86,7 +85,9 @@ class PympGUI(QtGui.QMainWindow):
         #cssStyle = "border: 1px solid black; padding: 1px;"
         #self.setStyleSheet(cssStyle)
         
+        self.queuedlg = QueueDialog(self)
         self.initUI()
+        
 
     def initUI(self):
         ''' TODO: init user interface'''
@@ -254,6 +255,7 @@ class PympGUI(QtGui.QMainWindow):
         # IF REPEAT...
         self.player.finishedSong.connect(self.plsPanel.nextPath)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
+        self.plsPanel.enqueue.connect(self.queuedlg.append)
         
 
 class PlaylistPanel(QtGui.QWidget):
@@ -267,6 +269,8 @@ class PlaylistPanel(QtGui.QWidget):
     # send signal on double click
     playCurrent = QtCore.pyqtSignal(QtCore.QString)
     playNext = QtCore.pyqtSignal(QtCore.QString)
+    enqueue = QtCore.pyqtSignal(list)
+    dequeue = QtCore.pyqtSignal(list)
     
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -326,10 +330,24 @@ class PlaylistPanel(QtGui.QWidget):
 
         menu = QtGui.QMenu()
         id3Action = menu.addAction('ID3 Editor')
-        action = menu.exec_(self.mapToGlobal(point))
+        queueAction = menu.addAction('Queue')
+        enqueueAction = menu.addAction('enqueue track')
+        dequeueAction = menu.addAction('dequeue track')
+        action = menu.exec_(self.mapToGlobal(point))        
+        
+        QueueDialog
         if action == id3Action:
             id3dlg = ID3Edit(self, data[-1])
             id3dlg.show()
+        elif action == queueAction:
+            self.parent.queuedlg.show()
+        elif action == enqueueAction:
+            print "enqueue: ", data
+            self.enqueue.emit(data)
+        elif action == dequeueAction:
+            self.dequeue.emit(data)
+        else:
+            print "unknown action (QTableView)"
 
     def clearPlaylist(self):
         self.model.clear()
@@ -869,6 +887,63 @@ class ControlBar(QtGui.QWidget):
         #rect = QRect(0, 0, self.width(), self.height())
         #qp.drawText(rect, Qt.AlignCenter, "self.text()")
         qp.end()
+
+
+class QueueDialog(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.parent = parent
+        self.initUI()
+    
+    def initUI(self):
+        vbox = QtGui.QVBoxLayout(self)
+        self.searchBar = SearchBar(self)
+        self.tbl = myQTableView(self) #QtGui.QTableView(self)
+        self.model = MyTableModel()
+        self.tbl.setModel(self.model)
+        self.tbl.setShowGrid(False)
+        self.tbl.setColumnHidden(0, True)
+        vh = self.tbl.verticalHeader()
+        vh.setVisible(False)
+        vh.setDefaultSectionSize(14)
+        hh = self.tbl.horizontalHeader()
+        hh.setStretchLastSection(True)
+        
+        vbox.addWidget(self.searchBar)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        hbox.addWidget(self.tbl, 1)
+        vbox.addLayout(hbox)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        ok = QtGui.QPushButton(QtGui.QIcon('../data/iconsets/default/ok.png'), "", self)
+        ok.clicked.connect(self.onOk)
+        cancel = QtGui.QPushButton(QtGui.QIcon('../data/cancel.png'), "", self)
+        cancel.clicked.connect(self.onCancel)
+        hbox.addWidget(ok)
+        hbox.addWidget(cancel)
+        vbox.addLayout(hbox)
+
+        #hbox.addWidget(self.toolbar)
+        self.setModal(True)
+        self.setWindowTitle('Queue Dialog')
+        self.resize(800, 320)
+    
+    def append(self, item):
+        print "queue append to model"
+        self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.model.append(item)
+        self.emit(QtCore.SIGNAL("layoutChanged()"))
+        
+    def onOk(self):
+        ''' exit dialog with ok'''
+        print "ok"
+        self.setVisible(False)
+    
+    def onCancel(self):
+        ''' exit dialog with cancel '''
+        print "cancel"
+        self.setVisible(False)        
 
 
 class ID3Edit(QtGui.QDialog):
