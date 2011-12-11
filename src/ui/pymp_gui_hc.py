@@ -90,14 +90,7 @@ class PympGUI(QtGui.QMainWindow):
 
     def initUI(self):
         ''' TODO: init user interface'''
-        # controls
-        self.controlBar = ControlBar(self)
-        self.searchBarCollection = SearchBar(self)
-        self.searchBarPlaylist = SearchBar(self)
-        self.plsPanel = PlaylistPanel(self)
-        self.colPanel = CollectionPanel(self, self.plsPanel)
-        self.trackInfo = TrackInfoBar(self)
-        self.lyricPanel = LyricPanel(self)
+
         
         # actions in a dict :)
         self.actionsDict = {
@@ -109,7 +102,7 @@ class PympGUI(QtGui.QMainWindow):
                          'viewLyric' :      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', QtGui.qApp.quit, iconset['cancel']],
                          # ctrl actions
                          'playback_ff' :    ['FF', 'Ctrl+Q', 'Forward', QtGui.qApp.quit, iconset['playback_ff']],
-                         'playback_next' :  ['Next', 'Ctrl+Q', 'Next Track', self.plsPanel.nextPath, iconset['playback_next']],
+                         'playback_next' :  ['Next', 'Ctrl+Q', 'Next Track', QtGui.qApp.quit, iconset['playback_next']],
                          'playback_pause' : ['Pause', 'Ctrl+Q', 'Pause', QtGui.qApp.quit, iconset['playback_pause']],
                          'playback_play' :  ['Play', 'Ctrl+Q', 'Play', QtGui.qApp.quit, iconset['playback_play']],
                          'playback_prev' :  ['Prev', 'Ctrl+Q', 'Prev', QtGui.qApp.quit, iconset['playback_prev']],
@@ -150,28 +143,51 @@ class PympGUI(QtGui.QMainWindow):
         self.setWindowTitle('pymp')
         
         mainpanel = QtGui.QWidget(self)
-        hbox = QtGui.QHBoxLayout(mainpanel)
+        
+        left = QtGui.QFrame(self)
+        left.setFrameShape(QtGui.QFrame.StyledPanel)
+        center = QtGui.QFrame(self)
+        center.setFrameShape(QtGui.QFrame.StyledPanel)
+        right = QtGui.QFrame(self)
+        right.setFrameShape(QtGui.QFrame.StyledPanel)
+        
+        splitterMain = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        
+        # controls
+        self.controlBar = ControlBar(self)
+        self.searchBarCollection = SearchBar(self)
+        self.searchBarPlaylist = SearchBar(self)
+        self.plsPanel = PlaylistPanel(self)
+        self.colPanel = CollectionPanel(self, self.plsPanel)
+        self.trackInfo = TrackInfoBar(self)
+        self.lyricPanel = LyricPanel(self)
+        
+        hbox = QtGui.QHBoxLayout(self)
+        
         hbox.setSpacing(0)
-        vboxCollection = QtGui.QVBoxLayout(mainpanel)
+        vboxCollection = QtGui.QVBoxLayout(self)
         vboxCollection.addWidget(self.searchBarCollection)
         vboxCollection.addWidget(self.colPanel, 1)
+        left.setLayout(vboxCollection)
         
-        vboxPlaylist = QtGui.QVBoxLayout(mainpanel)
-        
+        vboxPlaylist = QtGui.QVBoxLayout(self)
         vboxPlaylist.addWidget(self.searchBarPlaylist)
         vboxPlaylist.addWidget(self.plsPanel, 1)
         vboxPlaylist.addWidget(self.trackInfo)
         vboxPlaylist.addWidget(self.controlBar)
+        center.setLayout(vboxPlaylist)
         
-        vboxLyric = QtGui.QVBoxLayout(mainpanel)
+        vboxLyric = QtGui.QVBoxLayout(self)
         vboxLyric.addWidget(self.lyricPanel, 1)
+        right.setLayout(vboxLyric)
         
-        hbox.addLayout(vboxCollection)
-        hbox.addLayout(vboxPlaylist, 1)
-        hbox.addLayout(vboxLyric)
+        splitterMain.addWidget(left)
+        splitterMain.addWidget(center)
+        splitterMain.addWidget(right)
         
-        self.setCentralWidget(mainpanel)
-        mainpanel.setLayout(hbox)
+        hbox.addWidget(splitterMain)
+        
+        self.setCentralWidget(splitterMain)
         self.show()
     
     def defAction(self):
@@ -215,9 +231,10 @@ class PympGUI(QtGui.QMainWindow):
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
         self.searchBarPlaylist.timerExpired.connect(self.plsPanel.usePattern)
+        self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
+        self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
+        self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
-        #self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
-        
         
 
 class PlaylistPanel(QtGui.QWidget):
@@ -251,6 +268,10 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tbl.setSortingEnabled(True)
         self.tbl.setWordWrap(False)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.tbl.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         #self.tbl.setRowHeight()
         self.tbl.resizeRowsToContents()
         vh = self.tbl.verticalHeader()
@@ -278,7 +299,7 @@ class PlaylistPanel(QtGui.QWidget):
 #        self.tbl.pressed.connect(self.pressed)
 
     def clearPlaylist(self):
-        pass
+        self.model.clear()
     
     def usePattern(self, pattern):
         print "rows: ", self.model.row_length()
@@ -336,21 +357,6 @@ class PlaylistPanel(QtGui.QWidget):
         if len(pattern) == 2 or mor:
             return any(br)
         return all(br)
-#        QString filter = textEdit->text();
-#for( int i = 0; i < table->rowCount(); ++i )
-#{
-#    bool match = false;
-#    for( int j = 0; j < table->columnCount(); ++j )
-#    {
-#        QTableWidgetItem *item = table->item( i, j );
-#        if( item->text().contains(filter) )
-#        {
-#            match = true;
-#            break;
-#        }
-#    }
-#    table->setRowHidden( i, !match );
-#}
 
     def getPath(self, idx):
         ''' get current path from QModelIndex '''
@@ -420,7 +426,7 @@ class CollectionPanel(QtGui.QWidget):
         self.tre.setColumnWidth(1, 90)
         self.tre.setColumnWidth(2, 100)
         #self.tre.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.tre.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.tre.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tre.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tre.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tre.customContextMenuRequested.connect(self.popup)
@@ -432,6 +438,13 @@ class CollectionPanel(QtGui.QWidget):
      
         vbox = QtGui.QHBoxLayout(self)
         vbox.addWidget(self.tre, 1)
+        
+    def usePattern(self, pattern):
+        pattern = str(pattern).lower().strip()
+        self.model.reset()
+        self.model.setPattern(pattern)
+        if pattern:
+            self.tre.expandAll()
     
     def _dclick_timeout(self):
         '''
@@ -564,7 +577,7 @@ class LyricWorker(QtCore.QThread):
             return
         else:
             print "QThread filed?..."
-            self.lyricFetched.emit('')
+            self.lyricFetched.emit('no lyrics found...')
         return
     
     def _read(self):
@@ -692,8 +705,9 @@ class SearchBar(QtGui.QWidget):
     
     def clrSearch(self):
         ''' clear search '''
-        self.line.setText('')
-        self.clearSearch.emit('')
+        self.pattern = ''
+        self.line.setText(self.pattern)
+        self.clearSearch.emit(self.pattern)
     
     def searchTimeout(self):
         self._search_timer.stop()

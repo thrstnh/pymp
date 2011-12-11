@@ -137,11 +137,16 @@ class myModel(QAbstractItemModel):
         super(myModel, self).__init__(parent)
         self.treeView = parent
         self.headers = ['Item', 'State', 'type']
+        self.pattern = ''
         self._init_collection()
 
         self.columns = 3
         # Create items
-        self._load()
+        self._load(self.pattern)
+    
+    def setPattern(self, pattern):
+        self.pattern = pattern
+        self._load(self.pattern)
 
     def _init_collection(self):
         self.collections = Collections()
@@ -293,7 +298,7 @@ class myModel(QAbstractItemModel):
     def nodeFromIndex(self, index):
         return index.internalPointer() if index.isValid() else self.root
 
-    def _load(self):
+    def _load(self, pattern=''):
         '''
         self.root = myNode('root', 'on', 'this is root', 'ROOT', None)
         collection = myNode('Collection n', 'on', 'collection', 'COLLECTION', self.root)
@@ -315,7 +320,7 @@ class myModel(QAbstractItemModel):
             cnodeTracks = myNode('noid3', 'on', 'no id3 tag', 'NOID3', collectionNode)
             self.__tree[cname + 'tracks'] = cnodeTracks
 
-            treedata = pymp.sqldb.tree_dict(cid, '')
+            treedata = pymp.sqldb.tree_dict(cid, pattern)
             if not treedata:
                 return
             for val in treedata:
