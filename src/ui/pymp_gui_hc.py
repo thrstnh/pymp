@@ -136,20 +136,27 @@ class PympGUI(QtGui.QMainWindow):
         self.statusBar()
         self.statusBar().showMessage('Ready')
         
-        self.toolbar = self.addToolBar('Exit')
-        [self.toolbar.addAction(self.actions[_]) for _ in self.actionsDict.keys()]
+        #self.toolbar = self.addToolBar('Exit')
+        self.options = self.addToolBar('Options')
+        #[self.toolbar.addAction(self.actions[_]) for _ in self.actionsDict.keys()]
+        
+        
         
         self.setGeometry(20, 20, 1220, 620)
         self.setWindowTitle('pymp')
         
         mainpanel = QtGui.QWidget(self)
         
-        left = QtGui.QFrame(self)
-        left.setFrameShape(QtGui.QFrame.StyledPanel)
-        center = QtGui.QFrame(self)
-        center.setFrameShape(QtGui.QFrame.StyledPanel)
-        right = QtGui.QFrame(self)
-        right.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.left = QtGui.QFrame(self)
+        self.left.setFrameShape(QtGui.QFrame.StyledPanel)
+        
+        self.options.addAction(self.qtregister_action('toggle_collection', 'ctrl+t', 'toggle Collection status tip', self.toggleCollection, iconset['layout_lp']))
+        self.options.addAction(self.qtregister_action('toggle_lyrics', 'ctrl+l', 'toggle Lyrics status tip', self.toggleLyrics, iconset['layout_rp']))
+        
+        self.center = QtGui.QFrame(self)
+        self.center.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.right = QtGui.QFrame(self)
+        self.right.setFrameShape(QtGui.QFrame.StyledPanel)
         
         splitterMain = QtGui.QSplitter(QtCore.Qt.Horizontal)
         
@@ -168,27 +175,37 @@ class PympGUI(QtGui.QMainWindow):
         vboxCollection = QtGui.QVBoxLayout(self)
         vboxCollection.addWidget(self.searchBarCollection)
         vboxCollection.addWidget(self.colPanel, 1)
-        left.setLayout(vboxCollection)
+        self.left.setLayout(vboxCollection)
         
         vboxPlaylist = QtGui.QVBoxLayout(self)
         vboxPlaylist.addWidget(self.searchBarPlaylist)
         vboxPlaylist.addWidget(self.plsPanel, 1)
         vboxPlaylist.addWidget(self.trackInfo)
         vboxPlaylist.addWidget(self.controlBar)
-        center.setLayout(vboxPlaylist)
+        self.center.setLayout(vboxPlaylist)
         
         vboxLyric = QtGui.QVBoxLayout(self)
         vboxLyric.addWidget(self.lyricPanel, 1)
-        right.setLayout(vboxLyric)
+        self.right.setLayout(vboxLyric)
         
-        splitterMain.addWidget(left)
-        splitterMain.addWidget(center)
-        splitterMain.addWidget(right)
+        splitterMain.addWidget(self.left)
+        splitterMain.addWidget(self.center)
+        splitterMain.addWidget(self.right)
         
         hbox.addWidget(splitterMain)
         
+        splitterMain.setStretchFactor(0, 1)
+        splitterMain.setStretchFactor(1, 2)
+        splitterMain.setStretchFactor(2, 1)
+        
         self.setCentralWidget(splitterMain)
         self.show()
+    
+    def toggleCollection(self):
+        self.left.setVisible(not self.left.isVisible())
+    
+    def toggleLyrics(self):
+        self.right.setVisible(not self.right.isVisible())
     
     def defAction(self):
         print "TODO: default action"
@@ -218,7 +235,7 @@ class PympGUI(QtGui.QMainWindow):
         self.controlBar.onPrev.connect(self.player.prev)
         self.controlBar.onStop.connect(self.player.stop)
         self.controlBar.onPlay.connect(self.player.play)
-        self.controlBar.onNext.connect(self.player.next)
+        self.controlBar.onNext.connect(self.plsPanel.nextPath)
         self.controlBar.onMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
@@ -234,6 +251,8 @@ class PympGUI(QtGui.QMainWindow):
         self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
         self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
         self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
+        # IF REPEAT...
+        self.player.finishedSong.connect(self.plsPanel.nextPath)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
         
 
@@ -254,6 +273,7 @@ class PlaylistPanel(QtGui.QWidget):
         self.initUI()
         # current tracks
         self.tracks = {}
+        self.parent = parent
     
     def initUI(self):
         ''' TODO: init user interface '''
@@ -272,6 +292,8 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.setFocusPolicy(QtCore.Qt.NoFocus)
         self.tbl.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.tbl.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tbl.customContextMenuRequested.connect(self.popup)
         #self.tbl.setRowHeight()
         self.tbl.resizeRowsToContents()
         vh = self.tbl.verticalHeader()
@@ -298,14 +320,21 @@ class PlaylistPanel(QtGui.QWidget):
 #        self.tbl.entered.connect(self.entered)
 #        self.tbl.pressed.connect(self.pressed)
 
+    def popup(self, point):
+        idx = self.tbl.selectionModel().currentIndex()
+        data = self.model.data_row(idx.row())
+
+        menu = QtGui.QMenu()
+        id3Action = menu.addAction('ID3 Editor')
+        action = menu.exec_(self.mapToGlobal(point))
+        if action == id3Action:
+            id3dlg = ID3Edit(self, data[-1])
+            id3dlg.show()
+
     def clearPlaylist(self):
         self.model.clear()
     
     def usePattern(self, pattern):
-        print "rows: ", self.model.row_length()
-        print "cols: ", self.model.column_length()
-        
-        
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()] 
         else:
@@ -316,13 +345,14 @@ class PlaylistPanel(QtGui.QWidget):
             self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
                 if self.__valid_entry(v, map(str.strip, pattern)):
+                    self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
                     self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
                     continue
                 
-        print "usePattern finished"
-        print "rows: ", self.model.row_length()
-        print "cols: ", self.model.column_length()
+        self.parent.statusBar().showMessage('%s Tracks' % (self.model.row_length()))
+        self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.tbl.resizeRowsToContents()
         self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
     
     def __valid_entry(self, item, pattern=[]):
@@ -365,7 +395,7 @@ class PlaylistPanel(QtGui.QWidget):
         return cpath
     
     def nextPath(self):
-        row = self.model.next()
+        row = self.model.nxt()
         self.tbl.selectRow(row)
         data = self.model.data_row(row)
         cpath = QtCore.QString(data[len(data)-1])
@@ -566,7 +596,10 @@ class LyricWorker(QtCore.QThread):
         if self.artist and self.title:
             lyr = self._read()
             if not lyr:
-                lyr = lyricwiki.get_lyrics(self.artist, self.title)
+                try:
+                    lyr = lyricwiki.get_lyrics(self.artist, self.title)
+                except Exception, e:
+                    print 'lyrics not found or error: ', e
                 if lyr:
                     lyr = "%s - %s\n\n%s" % (self.artist, self.title, lyr)
                     self._save(lyr)
@@ -897,6 +930,7 @@ class PlayerPhonon(QtCore.QObject):
     timeTotal = QtCore.pyqtSignal(QtCore.QString)
     timeScratched = QtCore.pyqtSignal(int)
     volScratched = QtCore.pyqtSignal(int)
+    finishedSong = QtCore.pyqtSignal()
     
     def __init__(self, parent):
         QtCore.QObject.__init__(self, parent)
@@ -919,7 +953,7 @@ class PlayerPhonon(QtCore.QObject):
     def stop(self):
         self.player.stop()
         
-    def next(self):
+    def nxt(self, cpath):
         print "Player::next"
         
     def prev(self):
@@ -968,7 +1002,7 @@ class PlayerPhonon(QtCore.QObject):
         
 
     def finished(self):
-        print "Player::finished"
+        self.finishedSong.emit()
 
 def handle_time(time):
         m, s = divmod(time, 60)
