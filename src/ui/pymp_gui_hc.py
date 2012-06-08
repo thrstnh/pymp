@@ -385,7 +385,7 @@ class PlaylistPanel(QtGui.QWidget):
         br = []
         for pi, p in enumerate(pattern):
             p = p.strip()
-            b = [False for i in range(len(pattern))]
+            b = map(lambda x: False, pattern)
             for k in keys:
                 if item[k]:
                     if case_sensitive:
