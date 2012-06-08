@@ -17,6 +17,7 @@ from ui.table_model import *
 from ui.tree_model import myModel
 from pprint import pprint
 from pymp.config import cfg
+from ui.pymp_gui_hc import PympGUI
 
 
 class PympSlimView(QtGui.QMainWindow, Ui_PympSlimView):
@@ -510,6 +511,11 @@ def main():
     window.show()
     sys.exit(app.exec_())
 
+def main_hc():
+    app = QtGui.QApplication(sys.argv)
+    app.setApplicationName('pymp')
+    pympgui = PympGUI()
+    sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    main()
+    main_hc()

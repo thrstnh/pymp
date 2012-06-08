@@ -17,7 +17,7 @@ from pymp.mp3 import PMP3
 from pymp.config import cfg as PYMPCFG, LYRICS_DIR
 import lyricwiki
 
-pref = '../data/iconsets/default/'
+pref = 'data/iconsets/default/'
 
 cssStyle = '''
 '''
