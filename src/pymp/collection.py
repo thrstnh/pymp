@@ -25,7 +25,7 @@ class Collections():
         self._collection_db = pymp.sqldb.get_collections()
         for k,v in self._collection_db.items():
             self.add(v['name'], v['path'])
-    
+
     def get_collections(self):
         return self._collection_db
 
@@ -79,18 +79,18 @@ class Collection():
         self._count_new = 0
         # collection worker
         self._cw = None
-        
+
     def _init_cid(self):
         self._cid = pymp.sqldb.get_collection_id(self._name)
 
     @property
     def cid(self):
         return self._cid
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @cid.setter
     def cid(self, cid):
         raise Exception('cid...')
@@ -173,7 +173,7 @@ class CollectionWorkerThread(threading.Thread):
                 alb, cnt, cnt_new, cnt_exi, cnt_not_acc, tstart, tstatus = da.split('::')
             elif data.find(':') > 0:
                 pass
-                
+
         attempt = 0
         while self._proc.is_alive() and attempt < 10:
             self._proc.terminate()
@@ -227,7 +227,7 @@ class CollectionWorkerProcess(object):
             print "done."
         except Exception, e:
             print "rescan failed!", e
-            
+
     def get_track_id(self, cid, path):
         trackid = 0
         try:
@@ -245,7 +245,7 @@ class CollectionWorkerProcess(object):
 
     def now(self, ):
         return int(time.time())
-    
+
     def get_artist_id(self, cid=0, tpe1='', tpe2=''):
         artid = 0
         if cid:
@@ -281,7 +281,7 @@ class CollectionWorkerProcess(object):
             except Exception, e:
                 print "get_artist_id::3\n%s\n%s\n%s\n\n" % (sql, params, e)
         return artid
-    
+
     def get_album_id(self, cid=0, talb='', tpos='', tdrc=''):
         albid = 0
         if cid:
@@ -542,7 +542,7 @@ class CollectionWorkerProcess(object):
                                     self.insert(int(self._cid), file, mp3all)
                     else:
                         self._count_exists += 1
-                        
+
                     if self._count % 10 == 0 or self._count < 10:
                         self._conn_pipe.send(u"%s:%s" % (self._name, self._count))
                         self._status_time = time.time()
@@ -564,7 +564,7 @@ class CollectionWorkerProcess(object):
             file = os.path.join(dirname, fname)
             if self._accept(file):
                 self._files_to_scan += 1
-                
+
     def _accept(self, path):
         root, ext = os.path.splitext(path)
         try:
@@ -654,7 +654,7 @@ class CollectionWorkerProcess(object):
         except Exception, e:
             print 'collection.get_track() failed: %s\n%s\n%s\n\n' % (sql, params, e)
             return []
-        
+
     def _format_time(self, t):
         m,s = divmod(t, 60)
         if m < 60:

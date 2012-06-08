@@ -116,7 +116,7 @@ id3_frames = {
 fields = ['TPE2', 'TPE1', 'TIT1', 'TIT2', 'TALB', 'TLEN', 'TDRC', 'TRCK',
         'TENC', 'TFLT', 'TDRL', 'TLAN', 'TPUB', 'TCOP',  'TCON', 'TCOM',
         'TSSE', 'TDTG', 'TBPM', 'TPOS', 'BITR']
-        
+
 #fields = ['TDRC', 'TRCK', 'TCON', 'TIT2', 'TPE1',
 #                'TPE2', 'TALB', 'TLEN', 'TPOS', 'TSSE']
 
@@ -140,7 +140,7 @@ class PMP3(object):
     def is_mp3(self):
         if self.mp3: return True
         return False
-    
+
     @property
     def has_id3(self):
         if self.id3: return True
@@ -208,7 +208,7 @@ class PMP3(object):
     def id3_frames(self):
         ret = dict()
         if self.is_mp3 and self.has_id3:
-            
+
             for fkey in id3_frames:
                 item = self.id3.get(fkey, '')
                 if item:

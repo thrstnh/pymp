@@ -76,7 +76,7 @@ class Playlist():
     @property
     def path(self):
         return self._path
-    
+
     @path.setter
     def path(self, newpath):
         self._path = newpath
@@ -124,7 +124,7 @@ class Playlist():
         else:
             h,m = divmod(m, 60)
             return "%i:%02i:%02i" %(h,m,s)
-        
+
     def load(self):
         raise NotImplementedError
 #        try:

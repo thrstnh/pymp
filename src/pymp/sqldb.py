@@ -66,7 +66,7 @@ def create_tables():
         sqlc.execute(sql)
     except Exception, e:
         print "err: %s" % sql
-        
+
     # album
     sql = u'''
         CREATE TABLE IF NOT EXISTS album (
@@ -363,17 +363,17 @@ def lfm_user(username='', md5password='', login=False, scrobble=False):
         return ret
     except Exception, e:
         pass
-    
+
     if login:
         login = 1
     else:
         login = 0
-    
+
     if scrobble:
         scrobble = 1
     else:
         scrobble = 0
-        
+
     try:
         sql = u'''
         INSERT INTO lfm (username, password, login, scrobble, dateadd, datechg)
@@ -396,7 +396,7 @@ def filter(cid, path, pattern, ids, kwargs):
                 artist.tpe1,
                 album.talb, album.tdrc,
                 genre.tcon
-                
+
                 FROM track
                 LEFT JOIN artist
                     ON track.artist_id = artist.id
@@ -595,9 +595,9 @@ def tree(cid, pattern=''):
         sql += '     OR artist.tpe1 LIKE "%' + pattern + '%" \n'
         sql += '     OR track.path LIKE "%' + pattern + '%" \n'
         sql += '     OR album.talb LIKE "%' + pattern + '%") \n'
-        
+
     sql += '''  ORDER BY artist.tpe1, album.tdrc, album.talb, track.trck
-                ASC''' 
+                ASC'''
     #print sql
     try:
         sqlc.execute(sql)
@@ -688,7 +688,7 @@ def count_artist_files(cid, artist):
     except Exception, e:
         print "err:count_artist_files:failed: %s" % e
     return cnt
-    
+
 
 def tree_dict(cid, pattern=''):
     params = list()
@@ -912,6 +912,7 @@ def qt_tree_dict(cid, pattern=''):
         print 'sql.tree_dict() failed: %s\n%s\n%s\n\n' % (sql, params, e)
         return []
 
+
 def play_track(tid=0):
     if tid > 0 and tid < cfg[DROP_ID]:
         sql = u'''INSERT INTO played (track_id, played)
@@ -923,11 +924,13 @@ def play_track(tid=0):
         except Exception, e:
             print 'sqldb.play_track() failed: %s\n  %s' % (sql, e)
 
+
 def delete_track(path):
     sql = u'DELETE FROM track WHERE PATH = ?'
     params = path,
     sqlc.execute(sql, params)
     conn.commit()
+
 
 def delete_collection(cid):
     sql = u'DELETE FROM artist WHERE collection_id = ?;'
@@ -937,7 +940,7 @@ def delete_collection(cid):
         conn.commit()
     except Exception, e:
         print 'delete_collection::artist failed: %s\n  %s' % (sql, e)
-    
+
     sql = u'DELETE FROM album WHERE collection_id = ?;'
     try:
         params = cid,
@@ -953,7 +956,7 @@ def delete_collection(cid):
         conn.commit()
     except Exception, e:
         print 'delete_collection::track failed: %s\n  %s' % (sql, e)
-        
+
     sql = u'DELETE FROM collection WHERE id = ?;'
     try:
         params = cid,

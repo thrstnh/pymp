@@ -97,7 +97,7 @@ class myNode(object):
         self.parent = parent
         self.children = []
         self.setParent(parent)
-        
+
     def setParent(self, parent):
         if parent != None:
             self.parent = parent
@@ -124,7 +124,7 @@ class myNode(object):
         value = self.children[row]
         self.children.remove(value)
         return True
-    
+
     def __len__(self):
         return len(self.children)
 
@@ -143,14 +143,14 @@ class myModel(QAbstractItemModel):
         self.columns = 3
         # Create items
         self._load(self.pattern)
-    
+
     def setPattern(self, pattern):
         self.pattern = pattern
         self._load(self.pattern)
 
     def _init_collection(self):
         self.collections = Collections()
-    
+
     def collection_rescan(self, name):
         '''
             returns: True, if collection scan started
@@ -229,10 +229,10 @@ class myModel(QAbstractItemModel):
         self.insertRow(len(parentNode)-1, parentIndex)
         self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), parentIndex, parentIndex)
         return True
-    
+
     def insertRow(self, row, parent):
         return self.insertRows(row, 1, parent)
-    
+
     def insertRows(self, row, count, parent):
         self.beginInsertRows(parent, row, (row + (count - 1)))
         self.endInsertRows()
@@ -271,7 +271,7 @@ class myModel(QAbstractItemModel):
 
     def columnCount(self, parent):
         return self.columns
-    
+
     def rowCount(self, parent):
         node = self.nodeFromIndex(parent)
         if node is None:
@@ -314,7 +314,7 @@ class myModel(QAbstractItemModel):
             self.__tree[cname] = {}
             ctcount = pymp.sqldb.count_collection_tracks(cid)
             collectionNode = myNode(cname, "%s files" % ctcount, 'collection', 'COLLECTION', self.root)
-            
+
             self.__tree[cname + 'node'] = collectionNode
 
             cnodeTracks = myNode('noid3', 'on', 'no id3 tag', 'NOID3', collectionNode)
