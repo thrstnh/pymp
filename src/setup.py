@@ -4,24 +4,16 @@ __date__ ="$03.02.2011 15:25:25$"
 from setuptools import setup,find_packages
 
 setup (
-  name = 'pymp-slim',
-  version = '0.1',
-  packages = find_packages(),
-
-  # Declare your packages' dependencies here, for eg:
-  install_requires=['foo>=3'],
-
-  # Fill in these to make your Egg ready for upload to
-  # PyPI
-  author = 'thrstnh',
-  author_email = '',
-
-  summary = 'Just another Python package for the cheese shop',
-  url = '',
-  license = '',
-  long_description= 'Long description of the package',
-
-  # could also include long_description, download_url, classifiers, etc.
-
-  
-)
+    name = 'pymp',
+    version = '0.1',
+    packages=find_packages(),
+    install_requires=['PyQt4',
+                      'sqlite3',
+                      'mutagen',
+                      'lyricwiki',
+                      'PyQt4.phonon'],
+    author = 'thrstnh',
+    author_email = 'thrstn.hllbrnd@gmail.com',
+    summary = 'yet another python music player',
+    url = 'https://github.com/thrstnh/pymp',
+    license = 'free for all')
