@@ -354,7 +354,7 @@ class PlaylistPanel(QtGui.QWidget):
             self.model.clear()
             self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
-                if self.__valid_entry(v, map(str.strip, pattern)):
+                if self.__valid_entry(v, map(str.strip, pattern), (1, 2, 3)):
                     self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
                     self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
@@ -365,11 +365,17 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.resizeRowsToContents()
         self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
 
-    def __valid_entry(self, item, pattern=[]):
+    def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
+        r'''example:
+                item = ['Tenacious D', 'Tribute', 'Homemade', 'Rock']
+                pattern = ['tenac', 'rock']
+                keys = (0, 3)
+                # would match every pattern in item with given index
+        '''
         # mode: or
-        mor = True if 'or' in pattern else False
+        mor = True if 'or' in ([p.lower() for p in pattern] if not case_sensitive else pattern) else False
         # mode: and
-        mand = True if 'and' in pattern else False
+        mand = True if 'and' in ([p.lower() for p in pattern] if not case_sensitive else pattern) else False
         if mor:
             while pattern.count('or') > 0:
                 pattern.remove('or')
@@ -377,24 +383,19 @@ class PlaylistPanel(QtGui.QWidget):
             while pattern.count('and') > 0:
                 pattern.remove('and')
         br = []
-        for p in pattern:
+        for pi, p in enumerate(pattern):
             p = p.strip()
-            b0 = b1 = b2 = b3 = False
-            #if item[-1]: # path
-            #    if p in item[-1].lower():
-            #        b0 = True
-            if item[1]: # title
-                if p in item[1].lower():
-                    b1 = True
-            if item[2]: # artist
-                if p in item[2].lower():
-                    b2 = True
-            if item[3]: # album
-                if p in item[3].lower():
-                    b3 = True
-            br.append(any([b0, b1, b2, b3]))
-
-        if len(pattern) == 2 or mor:
+            b = [False for i in range(len(pattern))]
+            for k in keys:
+                if item[k]:
+                    if case_sensitive:
+                        if p in item[k]:
+                            b[pi] = True
+                    else:
+                        if p.lower() in item[k].lower():
+                            b[pi] = True
+            br.append(any(b))
+        if mor:
             return any(br)
         return all(br)
 
