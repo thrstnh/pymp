@@ -345,6 +345,7 @@ class PlaylistPanel(QtGui.QWidget):
         self.model.clear()
 
     def usePattern(self, pattern):
+        tstart = time.time()
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
@@ -364,6 +365,8 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
         self.tbl.resizeRowsToContents()
         self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+        tstop = time.time()
+        print(':fill {}s'.format(tstop - tstart))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
         r'''example:
@@ -372,10 +375,13 @@ class PlaylistPanel(QtGui.QWidget):
                 keys = (0, 3)
                 # would match every pattern in item with given index
         '''
+        if not case_sensitive:
+            item = [s.lower() if isinstance(s, basestring) else s for s in item]
+            pattern = map(str.lower, pattern)
         # mode: or
-        mor = True if 'or' in ([p.lower() for p in pattern] if not case_sensitive else pattern) else False
+        mor = True if 'or' in pattern else False
         # mode: and
-        mand = True if 'and' in ([p.lower() for p in pattern] if not case_sensitive else pattern) else False
+        mand = True if 'and' in pattern else False
         if mor:
             while pattern.count('or') > 0:
                 pattern.remove('or')
@@ -383,18 +389,8 @@ class PlaylistPanel(QtGui.QWidget):
             while pattern.count('and') > 0:
                 pattern.remove('and')
         br = []
-        for pi, p in enumerate(pattern):
-            p = p.strip()
-            b = map(lambda x: False, pattern)
-            for k in keys:
-                if item[k]:
-                    if case_sensitive:
-                        if p in item[k]:
-                            b[pi] = True
-                    else:
-                        if p.lower() in item[k].lower():
-                            b[pi] = True
-            br.append(any(b))
+        for p in pattern:
+            br.append(any([p in item[k] for k in keys]))
         if mor:
             return any(br)
         return all(br)
