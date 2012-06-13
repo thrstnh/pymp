@@ -21,49 +21,57 @@ pref = 'data/iconsets/default/'
 cssStyle = '''
 '''
 
-iconset = {"arr_down": os.path.join(pref, 'arr_down.png'),
-           "arr_left": os.path.join(pref + 'arr_left.png'),
-           "arr_right": os.path.join(pref + 'arr_right.png'),
-           "arr_up": os.path.join(pref + 'arr_up.png'),
-           "cancel": os.path.join(pref + 'cancel.png'),
-           "clear": os.path.join(pref + 'clear.png'),
-           "cut": os.path.join(pref + 'cut.png'),
-           "delete": os.path.join(pref + 'delete.png'),
-           "error": os.path.join(pref + 'error.png'),
-           "exit": os.path.join(pref + 'exit.png'),
-           "filter": os.path.join(pref + 'filter.png'),
-           "focus": os.path.join(pref + 'focus.png'),
-           "layout_lm": os.path.join(pref + 'layout_lm.png'),
-           "layout_lp": os.path.join(pref + 'layout_lp.png'),
-           "layout_rm": os.path.join(pref + 'layout_rm.png'),
-           "layout_rp": os.path.join(pref + 'layout_rp.png'),
-           "lfm_f": os.path.join(pref + 'lfm_f.png'),
-           "lfm_t": os.path.join(pref + 'lfm_t.png'),
-           "love_track": os.path.join(pref + 'love_track.png'),
-           "new": os.path.join(pref + 'new.png'),
-           "ok": os.path.join(pref + 'ok.png'),
-           "open": os.path.join(pref + 'open.png'),
-           "playback_ff": os.path.join(pref + 'playback_ff.png'),
-           "playback_next": os.path.join(pref + 'playback_next.png'),
-           "playback_pause": os.path.join(pref + 'playback_pause.png'),
-           "playback_play": os.path.join(pref + 'playback_play.png'),
-           "playback_prev": os.path.join(pref + 'playback_prev.png'),
-           "playback_rew": os.path.join(pref + 'playback_rew.png'),
-           "playback_stop": os.path.join(pref + 'playback_stop.png'),
-           "playback_mute": os.path.join(pref + 'speaker.png'),
-           "pymp": os.path.join(pref + 'pymp.png'),
-           "random_f": os.path.join(pref + 'random_f.png'),
-           "random_t": os.path.join(pref + 'random_t.png'),
-           "refresh": os.path.join(pref + 'refresh.png'),
-           "repeat_f": os.path.join(pref + 'repeat_f.png'),
-           "repeat_t": os.path.join(pref + 'repeat_t.png'),
-           "save": os.path.join(pref + 'save.png'),
-           "search": os.path.join(pref + 'search.png'),
-           "settings": os.path.join(pref + 'settings.png'),
-           "shuffle": os.path.join(pref + 'shuffle.png'),
-           "speaker": os.path.join(pref + 'speaker.png'),
-           "warning": os.path.join(pref + 'warning.png'),
-           "lookandfeel": os.path.join(pref + 'warning.png')}
+iconset = {"arr_down": 'arr_down.png',
+           "arr_left": 'arr_left.png',
+           "arr_right": 'arr_right.png',
+           "arr_up": 'arr_up.png',
+           "cancel": 'cancel.png',
+           "clear": 'clear.png',
+           "cut": 'cut.png',
+           "delete": 'delete.png',
+           "error": 'error.png',
+           "exit": 'exit.png',
+           "filter": 'filter.png',
+           "focus": 'focus.png',
+           "layout_lm": 'layout_lm.png',
+           "layout_lp": 'layout_lp.png',
+           "layout_rm": 'layout_rm.png',
+           "layout_rp": 'layout_rp.png',
+           "lfm_f": 'lfm_f.png',
+           "lfm_t": 'lfm_t.png',
+           "love_track": 'love_track.png',
+           "new": 'new.png',
+           "ok": 'ok.png',
+           "open": 'open.png',
+           "playback_ff": 'playback_ff.png',
+           "playback_next": 'playback_next.png',
+           "playback_pause": 'playback_pause.png',
+           "playback_play": 'playback_play.png',
+           "playback_prev": 'playback_prev.png',
+           "playback_rew": 'playback_rew.png',
+           "playback_stop": 'playback_stop.png',
+           "playback_mute": 'speaker.png',
+           "pymp": 'pymp.png',
+           "random_f": 'random_f.png',
+           "random_t": 'random_t.png',
+           "refresh": 'refresh.png',
+           "repeat_f": 'repeat_f.png',
+           "repeat_t": 'repeat_t.png',
+           "save": 'save.png',
+           "search": 'search.png',
+           "settings": 'settings.png',
+           "shuffle": 'shuffle.png',
+           "speaker": 'speaker.png',
+           "warning": 'warning.png',
+           "lookandfeel": 'warning.png'}
+
+def _init_icon_set(icons):
+    ret = {}
+    for k, v in icons.items():
+        ret[k] = os.path.join(pref, v)
+    return ret
+
+iconset = _init_icon_set(iconset)
 
 
 class PympGUI(QtGui.QMainWindow):
@@ -904,9 +912,9 @@ class QueueDialog(QtGui.QDialog):
         vbox.addLayout(hbox)
 
         hbox = QtGui.QHBoxLayout(self)
-        ok = QtGui.QPushButton(QtGui.QIcon('../data/iconsets/default/ok.png'), "", self)
+        ok = QtGui.QPushButton(QtGui.QIcon(iconset['ok']), "", self)
         ok.clicked.connect(self.onOk)
-        cancel = QtGui.QPushButton(QtGui.QIcon('../data/cancel.png'), "", self)
+        cancel = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
         cancel.clicked.connect(self.onCancel)
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
@@ -956,9 +964,9 @@ class ID3Edit(QtGui.QDialog):
             vbox.addLayout(hbox)
 
         hbox = QtGui.QHBoxLayout(self)
-        ok = QtGui.QPushButton(QtGui.QIcon('../data/iconsets/default/ok.png'), "", self)
+        ok = QtGui.QPushButton(QtGui.QIcon(iconset['ok']), "", self)
         ok.clicked.connect(self.onOk)
-        cancel = QtGui.QPushButton(QtGui.QIcon('../data/cancel.png'), "", self)
+        cancel = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
         cancel.clicked.connect(self.onCancel)
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
