@@ -8,7 +8,8 @@ date:   07.12.2011 16:15
 import sys
 import os
 import time
-from PyQt4 import QtGui, QtCore
+from PyQt4.QtGui import *
+from PyQt4 import QtCore
 from PyQt4.phonon import Phonon
 from tree_model import myModel
 from table_model import MyTableModel, myQTableView
@@ -79,7 +80,7 @@ def _init_icon_set(icons):
 iconset = _init_icon_set(iconset)
 
 
-class PympGUI(QtGui.QMainWindow):
+class PympGUI(QMainWindow):
     '''
         MainWindow of the python music player (pymp)
     '''
@@ -87,10 +88,10 @@ class PympGUI(QtGui.QMainWindow):
         super(PympGUI, self).__init__()
 
         self.actions = {}
-        self.uistyles = [str(style) for style in QtGui.QStyleFactory.keys()]
+        self.uistyles = [str(style) for style in QStyleFactory.keys()]
         self.uistyleid = 0
-        QtGui.QApplication.setStyle(QtGui.QStyleFactory.create(self.uistyles[self.uistyleid]))
-        QtGui.QApplication.setPalette(QtGui.QApplication.style().standardPalette())
+        QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
+        QApplication.setPalette(QApplication.style().standardPalette())
         #cssStyle = "border: 1px solid black; padding: 1px;"
         #self.setStyleSheet(cssStyle)
         self.queuedlg = QueueDialog(self)
@@ -101,28 +102,28 @@ class PympGUI(QtGui.QMainWindow):
 
         # actions in a dict :)
         self.actionsDict = {
-                         'addCollection':  ['Add &Collection', 'Ctrl+Q', 'Add Collection', QtGui.qApp.quit, iconset['new']],
-                         'newPlaylist':    ['New &Playlist', 'Ctrl+P', 'New Playlist', QtGui.qApp.quit, iconset['new']],
-                         'openPlaylist':   ['Open Playlist', 'Ctrl+P', 'Open Playlist', QtGui.qApp.quit, iconset['open']],
-                         'savePlaylist':   ['Save Playlist', 'Ctrl+P', 'Save Playlist', QtGui.qApp.quit, iconset['save']],
-                         'viewCollection': ['View Collection', 'Ctrl+I', 'View Collection Panel', QtGui.qApp.quit, iconset['cancel']],
-                         'viewLyric':      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', QtGui.qApp.quit, iconset['cancel']],
+                         'addCollection':  ['Add &Collection', 'Ctrl+Q', 'Add Collection', qApp.quit, iconset['new']],
+                         'newPlaylist':    ['New &Playlist', 'Ctrl+P', 'New Playlist', qApp.quit, iconset['new']],
+                         'openPlaylist':   ['Open Playlist', 'Ctrl+P', 'Open Playlist', qApp.quit, iconset['open']],
+                         'savePlaylist':   ['Save Playlist', 'Ctrl+P', 'Save Playlist', qApp.quit, iconset['save']],
+                         'viewCollection': ['View Collection', 'Ctrl+I', 'View Collection Panel', qApp.quit, iconset['cancel']],
+                         'viewLyric':      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', qApp.quit, iconset['cancel']],
                          # ctrl actions
-                         'playback_ff':    ['FF', 'Ctrl+Q', 'Forward', QtGui.qApp.quit, iconset['playback_ff']],
-                         'playback_next':  ['Next', 'Ctrl+Q', 'Next Track', QtGui.qApp.quit, iconset['playback_next']],
-                         'playback_pause': ['Pause', 'Ctrl+Q', 'Pause', QtGui.qApp.quit, iconset['playback_pause']],
-                         'playback_play':  ['Play', 'Ctrl+Q', 'Play', QtGui.qApp.quit, iconset['playback_play']],
-                         'playback_prev':  ['Prev', 'Ctrl+Q', 'Prev', QtGui.qApp.quit, iconset['playback_prev']],
-                         'playback_rew':   ['Rew', 'Ctrl+Q', 'Rew', QtGui.qApp.quit, iconset['playback_rew']],
-                         'playback_stop':  ['Stop', 'Ctrl+Q', 'Stop', QtGui.qApp.quit, iconset['playback_stop']],
-                         'playback_mute':  ['Mute', 'Ctrl+Q', 'Mute', QtGui.qApp.quit, iconset['playback_mute']],
+                         'playback_ff':    ['FF', 'Ctrl+Q', 'Forward', qApp.quit, iconset['playback_ff']],
+                         'playback_next':  ['Next', 'Ctrl+Q', 'Next Track', qApp.quit, iconset['playback_next']],
+                         'playback_pause': ['Pause', 'Ctrl+Q', 'Pause', qApp.quit, iconset['playback_pause']],
+                         'playback_play':  ['Play', 'Ctrl+Q', 'Play', qApp.quit, iconset['playback_play']],
+                         'playback_prev':  ['Prev', 'Ctrl+Q', 'Prev', qApp.quit, iconset['playback_prev']],
+                         'playback_rew':   ['Rew', 'Ctrl+Q', 'Rew', qApp.quit, iconset['playback_rew']],
+                         'playback_stop':  ['Stop', 'Ctrl+Q', 'Stop', qApp.quit, iconset['playback_stop']],
+                         'playback_mute':  ['Mute', 'Ctrl+Q', 'Mute', qApp.quit, iconset['playback_mute']],
                          'lookandfeel':    ['look and feel', 'Ctrl+F', 'Change look and feel', self.lookandfeel, iconset['lookandfeel']],
                          'shuffle':        ['shuffle', 'Ctrl+F', 'shuffle true/false', self.defAction, iconset['random_f']],
                          'repeat':         ['repeat', 'Ctrl+F', 'repeat true/false', self.defAction, iconset['repeat_f']],
                          'clear':          ['clear Playlist', 'Ctrl+F', 'clear playlist', self.defAction, iconset['clear']],
-                         'help':           ['help', 'Ctrl+F', 'help', QtGui.qApp.quit, iconset['cancel']],
-                         'about':          ['About pymp', 'Ctrl+F', 'about', QtGui.qApp.quit, iconset['cancel']],
-                         'exit':           ['Exit', 'Ctrl+Q', 'Exit Application', QtGui.qApp.quit, iconset['exit']]}
+                         'help':           ['help', 'Ctrl+F', 'help', qApp.quit, iconset['cancel']],
+                         'about':          ['About pymp', 'Ctrl+F', 'about', qApp.quit, iconset['cancel']],
+                         'exit':           ['Exit', 'Ctrl+Q', 'Exit Application', qApp.quit, iconset['exit']]}
 
         # compute actions-dict
         for (k,v) in self.actionsDict.items():
@@ -151,20 +152,20 @@ class PympGUI(QtGui.QMainWindow):
         self.setGeometry(20, 20, 1220, 620)
         self.setWindowTitle('pymp')
 
-        mainpanel = QtGui.QWidget(self)
+        mainpanel = QWidget(self)
 
-        self.left = QtGui.QFrame(self)
-        self.left.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.left = QFrame(self)
+        self.left.setFrameShape(QFrame.StyledPanel)
 
         self.options.addAction(self.qtregister_action('toggle_collection', 'ctrl+t', 'toggle Collection status tip', self.toggleCollection, iconset['layout_lp']))
         self.options.addAction(self.qtregister_action('toggle_lyrics', 'ctrl+l', 'toggle Lyrics status tip', self.toggleLyrics, iconset['layout_rp']))
 
-        self.center = QtGui.QFrame(self)
-        self.center.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.right = QtGui.QFrame(self)
-        self.right.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.center = QFrame(self)
+        self.center.setFrameShape(QFrame.StyledPanel)
+        self.right = QFrame(self)
+        self.right.setFrameShape(QFrame.StyledPanel)
 
-        splitterMain = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        splitterMain = QSplitter(QtCore.Qt.Horizontal)
 
         # controls
         self.controlBar = ControlBar(self)
@@ -175,22 +176,22 @@ class PympGUI(QtGui.QMainWindow):
         self.trackInfo = TrackInfoBar(self)
         self.lyricPanel = LyricPanel(self)
 
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
 
         hbox.setSpacing(0)
-        vboxCollection = QtGui.QVBoxLayout(self)
+        vboxCollection = QVBoxLayout(self)
         vboxCollection.addWidget(self.searchBarCollection)
         vboxCollection.addWidget(self.colPanel, 1)
         self.left.setLayout(vboxCollection)
 
-        vboxPlaylist = QtGui.QVBoxLayout(self)
+        vboxPlaylist = QVBoxLayout(self)
         vboxPlaylist.addWidget(self.searchBarPlaylist)
         vboxPlaylist.addWidget(self.plsPanel, 1)
         vboxPlaylist.addWidget(self.trackInfo)
         vboxPlaylist.addWidget(self.controlBar)
         self.center.setLayout(vboxPlaylist)
 
-        vboxLyric = QtGui.QVBoxLayout(self)
+        vboxLyric = QVBoxLayout(self)
         vboxLyric.addWidget(self.lyricPanel, 1)
         self.right.setLayout(vboxLyric)
 
@@ -218,7 +219,7 @@ class PympGUI(QtGui.QMainWindow):
 
     def qtregister_action(self, name, shortcut, statustip, triggeraction, image):
         ''' TODO: register a qt-action the lazy way'''
-        action = QtGui.QAction(QtGui.QIcon(image), name, self)
+        action = QAction(QIcon(image), name, self)
         action.setShortcut(shortcut)
         action.setStatusTip(statustip)
         action.triggered.connect(triggeraction)
@@ -229,8 +230,8 @@ class PympGUI(QtGui.QMainWindow):
             self.uistyleid = 0
         else:
             self.uistyleid += 1
-        QtGui.QApplication.setStyle(QtGui.QStyleFactory.create(self.uistyles[self.uistyleid]))
-        QtGui.QApplication.setPalette(QtGui.QApplication.style().standardPalette())
+        QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
+        QApplication.setPalette(QApplication.style().standardPalette())
 
     def showEvent(self, arg1):
         ''' show user interface '''
@@ -262,7 +263,7 @@ class PympGUI(QtGui.QMainWindow):
         self.plsPanel.enqueue.connect(self.queuedlg.append)
 
 
-class PlaylistPanel(QtGui.QWidget):
+class PlaylistPanel(QWidget):
     '''
         Playlist Table
 
@@ -277,7 +278,7 @@ class PlaylistPanel(QtGui.QWidget):
     dequeue = QtCore.pyqtSignal(list)
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.initUI()
         # current tracks
         self.tracks = {}
@@ -285,21 +286,21 @@ class PlaylistPanel(QtGui.QWidget):
 
     def initUI(self):
         ''' TODO: init user interface '''
-        self.tbl = myQTableView(self) #QtGui.QTableView(self)
+        self.tbl = myQTableView(self) #QTableView(self)
         self.model = MyTableModel()
         self.tbl.setModel(self.model)
         self.tbl.setShowGrid(False)
         self.tbl.setColumnHidden(0, True)
         self.tbl.setColumnHidden(self.model.column_length()-1, True)
-        self.tbl.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.tbl.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.tbl.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tbl.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl.setSortingEnabled(True)
         self.tbl.setWordWrap(False)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.tbl.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.tbl.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.tbl.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tbl.customContextMenuRequested.connect(self.popup)
         #self.tbl.setRowHeight()
@@ -310,17 +311,17 @@ class PlaylistPanel(QtGui.QWidget):
         hh = self.tbl.horizontalHeader()
         hh.setStretchLastSection(True)
 
-        self.toolbar = QtGui.QToolBar('Clear Playlist')
-        ac = QtGui.QAction(QtGui.QIcon(iconset['clear']), "Clear Playlist", self)
+        self.toolbar = QToolBar('Clear Playlist')
+        ac = QAction(QIcon(iconset['clear']), "Clear Playlist", self)
         ac.setStatusTip("Clear Playlist")
         ac.triggered.connect(self.clearPlaylist)
         self.toolbar.addAction(ac)
 
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(self.tbl, 1)
         hbox.addWidget(self.toolbar)
 
-        #vbox = QtGui.QVBoxLayout(self)
+        #vbox = QVBoxLayout(self)
 
 #        self.tbl.clicked.connect(self.clicked)
         self.tbl.doubleClicked.connect(self.double_clicked)
@@ -332,7 +333,7 @@ class PlaylistPanel(QtGui.QWidget):
         idx = self.tbl.selectionModel().currentIndex()
         data = self.model.data_row(idx.row())
 
-        menu = QtGui.QMenu()
+        menu = QMenu()
         id3Action = menu.addAction('ID3 Editor')
         queueAction = menu.addAction('Queue')
         enqueueAction = menu.addAction('enqueue track')
@@ -444,22 +445,22 @@ class PlaylistPanel(QtGui.QWidget):
         self.model.append(item)
 
 
-class CollectionPanel(QtGui.QWidget):
+class CollectionPanel(QWidget):
     '''
         Collection Tree
     '''
     def __init__(self, parent=None, playlist=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.playlist = playlist
         self._dclick_timer = QtCore.QTimer(self)
         self.initUI()
 
     def initUI(self):
         ''' TODO: init user interface '''
-        self.tre = QtGui.QTreeView(self)
+        self.tre = QTreeView(self)
         self.model = myModel()
         self.tre.setModel(self.model)
-        self.tre.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.tre.setDragDropMode(QAbstractItemView.InternalMove)
         self.tre.dragEnabled()
         self.tre.acceptDrops()
         self.tre.showDropIndicator()
@@ -469,7 +470,7 @@ class CollectionPanel(QtGui.QWidget):
         self.tre.setColumnWidth(2, 100)
         #self.tre.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         #self.tre.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.tre.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.tre.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tre.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tre.customContextMenuRequested.connect(self.popup)
         self.tre.clicked.connect(self.clicked)
@@ -478,7 +479,7 @@ class CollectionPanel(QtGui.QWidget):
 
         self._dclick_timer.timeout.connect(self._dclick_timeout)
 
-        vbox = QtGui.QHBoxLayout(self)
+        vbox = QHBoxLayout(self)
         vbox.addWidget(self.tre, 1)
 
     def usePattern(self, pattern):
@@ -534,8 +535,8 @@ class CollectionPanel(QtGui.QWidget):
         self.node = self.model.nodeFromIndex(mindex)
         data = self.node.data
 
-        toolb = QtGui.QToolBar(self.tre)
-        popMenu = QtGui.QMenu(self.tre)
+        toolb = QToolBar(self.tre)
+        popMenu = QMenu(self.tre)
         actionNew = toolb.addAction('Collection::ADD', self.addCollection)
         popMenu.addAction(actionNew)
         popMenu.exec_(self.tre.mapToGlobal(point))
@@ -544,13 +545,13 @@ class CollectionPanel(QtGui.QWidget):
         logger.info('add collection')
 
 
-class LyricPanel(QtGui.QWidget):
+class LyricPanel(QWidget):
     '''
         load lyric from lyricwiki in background
     '''
     def __init__(self, parent=None):
         ''' TODO: init user interface '''
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.artist = ''
         self.track = ''
         self.monkey = None
@@ -558,10 +559,10 @@ class LyricPanel(QtGui.QWidget):
 
     def initUI(self):
         ''' init user interface '''
-        self.lblTrackInfo = QtGui.QLabel('')
-        self.txt = QtGui.QTextEdit(self)
+        self.lblTrackInfo = QLabel('')
+        self.txt = QTextEdit(self)
         self.txt.setReadOnly(True)
-        vbox = QtGui.QVBoxLayout(self)
+        vbox = QVBoxLayout(self)
         vbox.addWidget(self.lblTrackInfo)
         vbox.addWidget(self.txt, 1)
 
@@ -645,7 +646,7 @@ class LyricWorker(QtCore.QThread):
             f.write(lyr.encode('utf-8'))
 
 
-class TrackInfoBar(QtGui.QWidget):
+class TrackInfoBar(QWidget):
     '''
         Track Information Panel with current track
     '''
@@ -653,7 +654,7 @@ class TrackInfoBar(QtGui.QWidget):
     fetchLyrics = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.initUI()
         self.track = dict()
         self.track['artist'] = ''
@@ -665,10 +666,10 @@ class TrackInfoBar(QtGui.QWidget):
 
     def initUI(self):
         ''' TODO: init user interface '''
-        self.customLabel = QtGui.QLabel(self)
+        self.customLabel = QLabel(self)
 
-        vbox = QtGui.QVBoxLayout(self)
-        hbox = QtGui.QHBoxLayout(self)
+        vbox = QVBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(self.customLabel)
         vbox.addLayout(hbox)
 
@@ -696,7 +697,7 @@ class TrackInfoBar(QtGui.QWidget):
         self.customLabel.setText(tx)
 
 
-class SearchBar(QtGui.QWidget):
+class SearchBar(QWidget):
     '''
         Control Panel for search patterns
     '''
@@ -705,7 +706,7 @@ class SearchBar(QtGui.QWidget):
     timerExpired = QtCore.pyqtSignal(QtCore.QString)
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self._search_timer = QtCore.QTimer(self)
         self.initUI()
 
@@ -713,7 +714,7 @@ class SearchBar(QtGui.QWidget):
         ''' TODO: init user interface '''
         #pref = '../data/'
         #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
-        clr = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
+        clr = QPushButton(QIcon(iconset['cancel']), "", self)
         clr.setFocusPolicy(QtCore.Qt.NoFocus)
         clr.clicked.connect(self.clrSearch)
         clr.setMinimumSize(QtCore.QSize(16,16))
@@ -722,11 +723,11 @@ class SearchBar(QtGui.QWidget):
 
         self._search_timer.timeout.connect(self.searchTimeout)
 
-        self.line = QtGui.QLineEdit('', self)
+        self.line = QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
         self.line.returnPressed.connect(self.txReturn)
 
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(clr)
         hbox.addWidget(self.line, 1)
 
@@ -759,7 +760,7 @@ class SearchBar(QtGui.QWidget):
         self.timerExpired.emit(self.pattern)
 
 
-class ControlBar(QtGui.QWidget):
+class ControlBar(QWidget):
     '''
         Control Panel for prev, play, stop, next, mute and volume
     '''
@@ -774,7 +775,7 @@ class ControlBar(QtGui.QWidget):
     onTime = QtCore.pyqtSignal(int)
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.initUI()
 
     def initUI(self):
@@ -789,56 +790,56 @@ class ControlBar(QtGui.QWidget):
 
         sze = QtCore.QSize(16, 16)
 
-        prev = QtGui.QPushButton(QtGui.QIcon(iconset['playback_rew']), "", self)
+        prev = QPushButton(QIcon(iconset['playback_rew']), "", self)
         prev.setFocusPolicy(QtCore.Qt.NoFocus)
         prev.clicked.connect(self.onPrev.emit)
         prev.setMinimumSize(sze)
         prev.setMaximumSize(sze)
         #prev.setStyleSheet(cssButton)
 
-        stop = QtGui.QPushButton(QtGui.QIcon(iconset['playback_stop']), "", self)
+        stop = QPushButton(QIcon(iconset['playback_stop']), "", self)
         stop.setFocusPolicy(QtCore.Qt.NoFocus)
         stop.clicked.connect(self.onStop.emit)
         stop.setMinimumSize(sze)
         stop.setMaximumSize(sze)
         #stop.setStyleSheet(cssButton)
 
-        play = QtGui.QPushButton(QtGui.QIcon(iconset['playback_play']), "", self)
+        play = QPushButton(QIcon(iconset['playback_play']), "", self)
         play.setFocusPolicy(QtCore.Qt.NoFocus)
         play.clicked.connect(self.onPlay.emit)
         play.setMinimumSize(sze)
         play.setMaximumSize(sze)
         #play.setStyleSheet(cssButton)
 
-        nxt = QtGui.QPushButton(QtGui.QIcon(iconset['playback_next']), "", self)
+        nxt = QPushButton(QIcon(iconset['playback_next']), "", self)
         nxt.setFocusPolicy(QtCore.Qt.NoFocus)
         nxt.clicked.connect(self.onNext.emit)
         nxt.setMinimumSize(sze)
         nxt.setMaximumSize(sze)
         #nxt.setStyleSheet(cssButton)
 
-        mute = QtGui.QPushButton(QtGui.QIcon(iconset['playback_mute']), "", self)
+        mute = QPushButton(QIcon(iconset['playback_mute']), "", self)
         mute.setFocusPolicy(QtCore.Qt.NoFocus)
         mute.clicked.connect(self.onMute.emit)
         mute.setMinimumSize(sze)
         mute.setMaximumSize(sze)
         #mute.setStyleSheet(cssButton)
 
-        sldVol = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        sldVol = QSlider(QtCore.Qt.Horizontal, self)
         sldVol.setFocusPolicy(QtCore.Qt.NoFocus)
         sldVol.valueChanged[int].connect(self.volChangeValue)
         sldVol.valueChanged[int].connect(self.onVolume.emit)
 
-        self.tstart = QtGui.QLabel("00:00", self)
+        self.tstart = QLabel("00:00", self)
 
-        sldTime = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        sldTime = QSlider(QtCore.Qt.Horizontal, self)
         sldTime.setFocusPolicy(QtCore.Qt.NoFocus)
         sldTime.valueChanged[int].connect(self.timeChangeValue)
         sldTime.valueChanged[int].connect(self.onTime.emit)
 
-        self.ttotal = QtGui.QLabel("23:59", self)
+        self.ttotal = QLabel("23:59", self)
 
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(prev, 0)
         hbox.addWidget(stop, 0)
         hbox.addWidget(play)
@@ -871,23 +872,23 @@ class ControlBar(QtGui.QWidget):
         logger.info('{} {}'.format(name, ret))
 
     def paintEvent(self, event):
-        qp = QtGui.QPainter()
+        qp = QPainter()
         qp.begin(self)
         #rect = QRect(0, 0, self.width(), self.height())
         #qp.drawText(rect, Qt.AlignCenter, "self.text()")
         qp.end()
 
 
-class QueueDialog(QtGui.QDialog):
+class QueueDialog(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.parent = parent
         self.initUI()
 
     def initUI(self):
-        vbox = QtGui.QVBoxLayout(self)
+        vbox = QVBoxLayout(self)
         self.searchBar = SearchBar(self)
-        self.tbl = myQTableView(self) #QtGui.QTableView(self)
+        self.tbl = myQTableView(self) #QTableView(self)
         self.model = MyTableModel()
         self.tbl.setModel(self.model)
         self.tbl.setShowGrid(False)
@@ -900,14 +901,14 @@ class QueueDialog(QtGui.QDialog):
 
         vbox.addWidget(self.searchBar)
 
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(self.tbl, 1)
         vbox.addLayout(hbox)
 
-        hbox = QtGui.QHBoxLayout(self)
-        ok = QtGui.QPushButton(QtGui.QIcon(iconset['ok']), "", self)
+        hbox = QHBoxLayout(self)
+        ok = QPushButton(QIcon(iconset['ok']), "", self)
         ok.clicked.connect(self.onOk)
-        cancel = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
+        cancel = QPushButton(QIcon(iconset['cancel']), "", self)
         cancel.clicked.connect(self.onCancel)
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
@@ -935,30 +936,30 @@ class QueueDialog(QtGui.QDialog):
         self.setVisible(False)
 
 
-class ID3Edit(QtGui.QDialog):
+class ID3Edit(QDialog):
     '''
         ID3 Tag Editor
     '''
     def __init__(self, parent=None, fp=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.fp = fp
         self.data = self.load(self.fp)
         self.initUI()
 
     def initUI(self):
-        vbox = QtGui.QVBoxLayout(self)
+        vbox = QVBoxLayout(self)
         for (k,v) in self.data.items():
-            hbox = QtGui.QHBoxLayout(self)
-            lbl = QtGui.QLabel(str(k), self)
-            line = QtGui.QLineEdit(str(v), self)
+            hbox = QHBoxLayout(self)
+            lbl = QLabel(str(k), self)
+            line = QLineEdit(str(v), self)
             hbox.addWidget(lbl)
             hbox.addWidget(line, 1)
             vbox.addLayout(hbox)
 
-        hbox = QtGui.QHBoxLayout(self)
-        ok = QtGui.QPushButton(QtGui.QIcon(iconset['ok']), "", self)
+        hbox = QHBoxLayout(self)
+        ok = QPushButton(QIcon(iconset['ok']), "", self)
         ok.clicked.connect(self.onOk)
-        cancel = QtGui.QPushButton(QtGui.QIcon(iconset['cancel']), "", self)
+        cancel = QPushButton(QIcon(iconset['cancel']), "", self)
         cancel.clicked.connect(self.onCancel)
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
@@ -1077,12 +1078,12 @@ def show_msg(self, msg):
     '''
         simple message box
     '''
-    msgbox = QtGui.QMessageBox()
+    msgbox = QMessageBox()
     msgbox.setText(msg)
     msgbox.exec_()
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     app.setApplicationName('pymp')
     pympgui = PympGUI()
     sys.exit(app.exec_())
