@@ -18,9 +18,18 @@ from pymp.config import cfg as PYMPCFG, LYRICS_DIR
 import lyricwiki
 import logging
 
+def _init_logger():
+    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("simple_example")
+    logger.setLevel(logging.DEBUG)
+    sh = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    sh.setFormatter(formatter)
+    logger.addHandler(sh)
+    logger.setLevel(logging.DEBUG)
+    return logger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = _init_logger()
 
 pref = 'data/iconsets/default/'
 
@@ -739,7 +748,8 @@ class TrackInfoBar(QWidget):
         self.track['tracknr'] = mpfile.trackno
         self.track['genre'] = mpfile.genre
         self.updateInformation()
-        self.fetchLyrics.emit(self.track['artist'], self.track['title'])
+        self.fetchLyrics.emit(self.track.get('artist', ''),
+                              self.track.get('title', ''))
 
     def updateInformation(self):
         ''' sync vars with gui-labels '''
@@ -1105,7 +1115,6 @@ class PlayerPhonon(QObject):
 
     def tick(self, time):
         ''' tick timer for player updates'''
-        logger.info("Player::tick: {}".format(time))
         self._updateLabels()
 
     def _updateLabels(self):
