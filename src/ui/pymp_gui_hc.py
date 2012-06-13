@@ -245,9 +245,9 @@ class PympGUI(QtGui.QMainWindow):
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
         self.plsPanel.playCurrent.connect(self.player.play)
-        self.plsPanel.playCurrent.connect(self.trackInfo.track)
+        self.plsPanel.playCurrent.connect(self.trackInfo.update)
         self.plsPanel.playNext.connect(self.player.play)
-        self.plsPanel.playNext.connect(self.trackInfo.track)
+        self.plsPanel.playNext.connect(self.trackInfo.update)
         self.player.timeStart.connect(self.controlBar.setTimeStart)
         self.player.timeTotal.connect(self.controlBar.setTimeTotal)
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
@@ -362,7 +362,6 @@ class PlaylistPanel(QtGui.QWidget):
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
             pattern = str(pattern).lower().split()
-            match = False
             self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear()
             self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
@@ -377,8 +376,7 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
         self.tbl.resizeRowsToContents()
         self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
-        tstop = time.time()
-        logger.info(':fill {}s'.format(tstop - tstart))
+        logger.info(':fill {}s'.format(time.time() - tstart))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
         r'''example:
@@ -494,7 +492,7 @@ class CollectionPanel(QtGui.QWidget):
         '''
             called on timeout for double click timer
         '''
-        logger.infor('single click')
+        logger.info('single click')
         index = self.idx
         self.tre.setExpanded(index, not self.tre.isExpanded(index))
         self._dclick_timer.stop()
@@ -657,12 +655,13 @@ class TrackInfoBar(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.initUI()
-        self.artist = ''
-        self.title = ''
-        self.album = ''
-        self.year = ''
-        self.tracknr = ''
-        self.genre = ''
+        self.track = dict()
+        self.track['artist'] = ''
+        self.track['title'] = ''
+        self.track['album'] = ''
+        self.track['year'] = ''
+        self.track['tracknr'] = ''
+        self.track['genre'] = ''
 
     def initUI(self):
         ''' TODO: init user interface '''
@@ -673,26 +672,27 @@ class TrackInfoBar(QtGui.QWidget):
         hbox.addWidget(self.customLabel)
         vbox.addLayout(hbox)
 
-    def track(self, qstr):
+    def update(self, qstr):
         '''
             fill fields with data
         '''
         mpfile = PMP3(qstr)
-        self.artist = mpfile.artist
-        self.title = mpfile.title
-        self.album = mpfile.album
-        self.year = mpfile.year
-        self.tracknr = mpfile.trackno
-        self.genre = mpfile.genre
+        self.track['artist'] = mpfile.artist
+        self.track['title'] = mpfile.title
+        self.track['album'] = mpfile.album
+        self.track['year'] = mpfile.year
+        self.track['tracknr'] = mpfile.trackno
+        self.track['genre'] = mpfile.genre
 
         self.updateInformation()
-        self.fetchLyrics.emit(self.artist, self.title)
+        self.fetchLyrics.emit(self.track['artist'], self.track['title'])
 
     def updateInformation(self):
         '''
             sync vars with gui-labels
         '''
-        tx = '%s\t-\t%s \n%s\t (%s, %s) \t %s' % (self.artist, self.title, self.album, self.year, self.tracknr, self.genre)
+        tx = '{artist}\t-\t{title}\n{album}\t({year},{tracknr}\t{genre})'.format(**self.track)
+#        tx = '%s\t-\t%s \n%s\t (%s, %s) \t %s' % (self.artist, self.title, self.album, self.year, self.tracknr, self.genre)
         self.customLabel.setText(tx)
 
 
