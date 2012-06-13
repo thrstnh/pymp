@@ -15,6 +15,11 @@ from table_model import MyTableModel, myQTableView
 from pymp.mp3 import PMP3
 from pymp.config import cfg as PYMPCFG, LYRICS_DIR
 import lyricwiki
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 pref = 'data/iconsets/default/'
 
@@ -209,7 +214,6 @@ class PympGUI(QtGui.QMainWindow):
         self.right.setVisible(not self.right.isVisible())
 
     def defAction(self):
-        print "TODO: default action"
         raise NotImplementedError
 
     def qtregister_action(self, name, shortcut, statustip, triggeraction, image):
@@ -342,12 +346,12 @@ class PlaylistPanel(QtGui.QWidget):
         elif action == queueAction:
             self.parent.queuedlg.show()
         elif action == enqueueAction:
-            print "enqueue: ", data
+            logger.info('enqueue {}'.format(data))
             self.enqueue.emit(data)
         elif action == dequeueAction:
             self.dequeue.emit(data)
         else:
-            print "unknown action (QTableView)"
+            logger.info('unknown action (QTableView)')
 
     def clearPlaylist(self):
         self.model.clear()
@@ -374,7 +378,7 @@ class PlaylistPanel(QtGui.QWidget):
         self.tbl.resizeRowsToContents()
         self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
         tstop = time.time()
-        print(':fill {}s'.format(tstop - tstart))
+        logger.info(':fill {}s'.format(tstop - tstart))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
         r'''example:
@@ -418,7 +422,6 @@ class PlaylistPanel(QtGui.QWidget):
         return cpath
 
 #    def clicked(self, idx):
-#        print "playlist::clicked"
 #        raise NotImplementedError
 
     def double_clicked(self, idx):
@@ -428,15 +431,12 @@ class PlaylistPanel(QtGui.QWidget):
         return cpath
 
 #    def activated(self):
-#        print "playlist::activated"
 #        raise NotImplementedError
 
 #    def entered(self):
-#        print "playlist::entered"
 #        raise NotImplementedError
 
 #    def pressed(self, val1, val2):
-#        print "playlist::pressed ", val1, val2
 #        raise NotImplementedError
     def append(self, item):
         self.tracks[item[-1]] = item
@@ -494,7 +494,7 @@ class CollectionPanel(QtGui.QWidget):
         '''
             called on timeout for double click timer
         '''
-        print "single click"
+        logger.infor('single click')
         index = self.idx
         self.tre.setExpanded(index, not self.tre.isExpanded(index))
         self._dclick_timer.stop()
@@ -528,10 +528,8 @@ class CollectionPanel(QtGui.QWidget):
                     self._add_child_nodes(child)
 
 #    def activated(self):
-#        print "activated"
 #        raise NotImplementedError
 #    def pressed(self):
-#        print "pressed"
 #        raise NotImplementedError
     def popup(self, point):
         mindex = self.tre.indexAt(point)
@@ -545,7 +543,7 @@ class CollectionPanel(QtGui.QWidget):
         popMenu.exec_(self.tre.mapToGlobal(point))
 
     def addCollection(self):
-        print "add collection"
+        logger.info('add collection')
 
 
 class LyricPanel(QtGui.QWidget):
@@ -613,17 +611,17 @@ class LyricWorker(QtCore.QThread):
                 try:
                     lyr = lyricwiki.get_lyrics(self.artist, self.title)
                 except Exception, e:
-                    print 'lyrics not found or error: ', e
+                    logger.warning('lyrics not found or error: {}'.format(e))
                 if lyr:
                     lyr = "%s - %s\n\n%s" % (self.artist, self.title, lyr)
                     self._save(lyr)
         else:
-            print "worker got only: %s - %s" % (self.artist, self.title)
+            logger.info('worker got only: {} - {}'.format(self.artist, self.title))
         if lyr:
             self.lyricFetched.emit(lyr)
             return
         else:
-            print "QThread filed?..."
+            logger.debug("QThread filed?...")
             self.lyricFetched.emit('no lyrics found...')
         return
 
@@ -637,7 +635,7 @@ class LyricWorker(QtCore.QThread):
                 lyr = f.read()
             return lyr
         except Exception, e:
-            print("Lyrics Datei nicht gefunden: %s" % (fp))
+            logger.info("Lyrics Datei nicht gefunden: {}".format(fp))
         return ''
 
     def _save(self, lyr):
@@ -858,24 +856,19 @@ class ControlBar(QtGui.QWidget):
         self.ttotal.setText(time)
 
     def volChangeValue(self, value):
-        ''' TODO: slider changed value'''
-        print 'volume ',
-        if value == 0:
-            print "muted"
-        elif value == 99:
-            print "max"
-        else:
-            print value
+        self._slider_changed('volume', value)
 
     def timeChangeValue(self, value):
-        ''' TODO: slider changed value'''
-        print 'time ',
+        self._slider_changed('time', value)
+
+    def _slider_changed(self, name, value):
         if value == 0:
-            print "muted"
+            ret = 'muted'
         elif value == 99:
-            print "max"
+            ret = 'max'
         else:
-            print value
+            ret = value
+        logger.info('{} {}'.format(name, ret))
 
     def paintEvent(self, event):
         qp = QtGui.QPainter()
@@ -926,19 +919,19 @@ class QueueDialog(QtGui.QDialog):
         self.resize(800, 320)
 
     def append(self, item):
-        print "queue append to model"
+        logger.info("queue append to model")
         self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
         self.model.append(item)
         self.emit(QtCore.SIGNAL("layoutChanged()"))
 
     def onOk(self):
         ''' exit dialog with ok'''
-        print "ok"
+        logger.info("ok")
         self.setVisible(False)
 
     def onCancel(self):
         ''' exit dialog with cancel '''
-        print "cancel"
+        logger.info("cancel")
         self.setVisible(False)
 
 
@@ -953,7 +946,6 @@ class ID3Edit(QtGui.QDialog):
         self.initUI()
 
     def initUI(self):
-        print self.data
         vbox = QtGui.QVBoxLayout(self)
         for (k,v) in self.data.items():
             hbox = QtGui.QHBoxLayout(self)
@@ -984,12 +976,12 @@ class ID3Edit(QtGui.QDialog):
 
     def onOk(self):
         ''' exit dialog with ok'''
-        print "ok"
+        logger.info("ok")
         self.close()
 
     def onCancel(self):
         ''' exit dialog with cancel '''
-        print "cancel"
+        logger.info("cancel")
         self.close()
 
 class PlayerPhonon(QtCore.QObject):
@@ -1025,20 +1017,20 @@ class PlayerPhonon(QtCore.QObject):
         self.player.stop()
 
     def nxt(self, cpath):
-        print "Player::next"
+        logger.info("Player::next")
 
     def prev(self):
-        print "Player::prev"
+        logger.info("Player::prev")
 
     def mute(self):
         self.m_audio.setMuted(not self.m_audio.isMuted())
-        print "muted: ", self.m_audio.isMuted()
+        logger.info("muted: {}".format(self.m_audio.isMuted()))
 
     def random(self):
-        print "Player::random"
+        logger.info("Player::random")
 
     def repeat(self):
-        print "Player::repeat"
+        logger.info("Player::repeat")
 
     def volume(self, val):
         ''' TODO: slider changed value'''
@@ -1054,13 +1046,12 @@ class PlayerPhonon(QtCore.QObject):
             self.player.seek(seek)
             self.timeScratched.emit(seek)
         else:
-            print "not playing... ", time
+            logger.info("not playing... {}".format(val))
 
     def tick(self, time):
         ''' tick timer for player updates'''
-        #print "Player::tick: ", time
+        logger.info("Player::tick: {}".format(time))
         self._updateLabels()
-
 
     def _updateLabels(self):
         cur_s = 0
@@ -1070,7 +1061,6 @@ class PlayerPhonon(QtCore.QObject):
             self.timeStart.emit(handle_time(cur_s))
             total_s = self.player.totalTime() / 1000.
             self.timeTotal.emit(handle_time(total_s))
-
 
     def finished(self):
         self.finishedSong.emit()
