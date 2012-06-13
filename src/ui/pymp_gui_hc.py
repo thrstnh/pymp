@@ -9,7 +9,7 @@ import sys
 import os
 import time
 from PyQt4.QtGui import *
-from PyQt4 import QtCore
+from PyQt4.QtCore import *
 from PyQt4.phonon import Phonon
 from tree_model import myModel
 from table_model import MyTableModel, myQTableView
@@ -220,7 +220,7 @@ class PympGUI(QMainWindow):
         self.right = QFrame(self)
         self.right.setFrameShape(QFrame.StyledPanel)
 
-        splitterMain = QSplitter(QtCore.Qt.Horizontal)
+        splitterMain = QSplitter(Qt.Horizontal)
 
         # controls
         self.controlBar = ControlBar(self)
@@ -329,10 +329,10 @@ class PlaylistPanel(QWidget):
 
     '''
     # send signal on double click
-    playCurrent = QtCore.pyqtSignal(QtCore.QString)
-    playNext = QtCore.pyqtSignal(QtCore.QString)
-    enqueue = QtCore.pyqtSignal(list)
-    dequeue = QtCore.pyqtSignal(list)
+    playCurrent = pyqtSignal(QString)
+    playNext = pyqtSignal(QString)
+    enqueue = pyqtSignal(list)
+    dequeue = pyqtSignal(list)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -355,10 +355,10 @@ class PlaylistPanel(QWidget):
         self.tbl.setSortingEnabled(True)
         self.tbl.setWordWrap(False)
         self.tbl.setAlternatingRowColors(True)
-        self.tbl.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.tbl.setFocusPolicy(Qt.NoFocus)
         self.tbl.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tbl.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tbl.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbl.customContextMenuRequested.connect(self.popup)
         #self.tbl.setRowHeight()
         self.tbl.resizeRowsToContents()
@@ -420,20 +420,20 @@ class PlaylistPanel(QWidget):
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
             pattern = str(pattern).lower().split()
-            self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+            self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear()
-            self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+            self.tbl.emit(SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
                 if self.__valid_entry(v, map(str.strip, pattern), (1, 2, 3)):
-                    self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+                    self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
-                    self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+                    self.tbl.emit(SIGNAL("layoutChanged()"))
                     continue
 
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.row_length()))
-        self.tbl.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.tbl.resizeRowsToContents()
-        self.tbl.emit(QtCore.SIGNAL("layoutChanged()"))
+        self.tbl.emit(SIGNAL("layoutChanged()"))
         logger.info(':fill {}s'.format(time.time() - tstart))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
@@ -466,14 +466,14 @@ class PlaylistPanel(QWidget):
     def getPath(self, idx):
         ''' get current path from QModelIndex '''
         data = self.model.data_row(idx.row())
-        cpath = QtCore.QString(data[len(data)-1])
+        cpath = QString(data[len(data)-1])
         return cpath
 
     def nextPath(self):
         row = self.model.nxt()
         self.tbl.selectRow(row)
         data = self.model.data_row(row)
-        cpath = QtCore.QString(data[len(data)-1])
+        cpath = QString(data[len(data)-1])
         self.playNext.emit(cpath)
         return cpath
 
@@ -509,7 +509,7 @@ class CollectionPanel(QWidget):
     def __init__(self, parent=None, playlist=None):
         QWidget.__init__(self, parent)
         self.playlist = playlist
-        self._dclick_timer = QtCore.QTimer(self)
+        self._dclick_timer = QTimer(self)
         self.initUI()
 
     def initUI(self):
@@ -526,9 +526,9 @@ class CollectionPanel(QWidget):
         self.tre.setColumnWidth(1, 90)
         self.tre.setColumnWidth(2, 100)
         #self.tre.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        #self.tre.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.tre.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tre.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tre.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tre.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tre.customContextMenuRequested.connect(self.popup)
         self.tre.clicked.connect(self.clicked)
         #self.tre.activated.connect(self.activated)
@@ -645,15 +645,15 @@ class LyricPanel(QWidget):
             self.monkey.start()
 
 
-class LyricWorker(QtCore.QThread):
+class LyricWorker(QThread):
     '''
         Fetch Lyrics from LyricsWiki
     '''
     # signal called after lyrics fetched
-    lyricFetched = QtCore.pyqtSignal(QtCore.QString)
+    lyricFetched = pyqtSignal(QString)
 
     def __init__(self, parent, artist, title):
-        QtCore.QThread.__init__(self)
+        QThread.__init__(self)
         self.artist = artist
         self.title = title
 
@@ -706,7 +706,7 @@ class TrackInfoBar(QWidget):
         Track Information Panel with current track
     '''
     # fetch lyrics with new track information to keep the right chain
-    fetchLyrics = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
+    fetchLyrics = pyqtSignal(QString, QString)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -751,13 +751,13 @@ class SearchBar(QWidget):
     '''
         Control Panel for search patterns
     '''
-    search = QtCore.pyqtSignal(QtCore.QString)
-    clearSearch = QtCore.pyqtSignal(QtCore.QString)
-    timerExpired = QtCore.pyqtSignal(QtCore.QString)
+    search = pyqtSignal(QString)
+    clearSearch = pyqtSignal(QString)
+    timerExpired = pyqtSignal(QString)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        self._search_timer = QtCore.QTimer(self)
+        self._search_timer = QTimer(self)
         self.initUI()
 
     def initUI(self):
@@ -765,10 +765,10 @@ class SearchBar(QWidget):
         #pref = '../data/'
         #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
         clr = QPushButton(QIcon(iconset['cancel']), "", self)
-        clr.setFocusPolicy(QtCore.Qt.NoFocus)
+        clr.setFocusPolicy(Qt.NoFocus)
         clr.clicked.connect(self.clrSearch)
-        clr.setMinimumSize(QtCore.QSize(16,16))
-        clr.setMaximumSize(QtCore.QSize(16,16))
+        clr.setMinimumSize(QSize(16,16))
+        clr.setMaximumSize(QSize(16,16))
         #clr.setStyleSheet(cssButton)
 
         self._search_timer.timeout.connect(self.searchTimeout)
@@ -815,14 +815,14 @@ class ControlBar(QWidget):
         Control Panel for prev, play, stop, next, mute and volume
     '''
     # some new slots
-    onPrev = QtCore.pyqtSignal()
-    onStop = QtCore.pyqtSignal()
-    onPlay = QtCore.pyqtSignal()
-    onNext = QtCore.pyqtSignal()
-    onMute = QtCore.pyqtSignal()
-    onPlay = QtCore.pyqtSignal()
-    onVolume = QtCore.pyqtSignal(int)
-    onTime = QtCore.pyqtSignal(int)
+    onPrev = pyqtSignal()
+    onStop = pyqtSignal()
+    onPlay = pyqtSignal()
+    onNext = pyqtSignal()
+    onMute = pyqtSignal()
+    onPlay = pyqtSignal()
+    onVolume = pyqtSignal(int)
+    onTime = pyqtSignal(int)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -838,52 +838,52 @@ class ControlBar(QWidget):
 
         #self.setStyleSheet(cssDEBUG)
 
-        sze = QtCore.QSize(16, 16)
+        sze = QSize(16, 16)
 
         prev = QPushButton(QIcon(iconset['playback_rew']), "", self)
-        prev.setFocusPolicy(QtCore.Qt.NoFocus)
+        prev.setFocusPolicy(Qt.NoFocus)
         prev.clicked.connect(self.onPrev.emit)
         prev.setMinimumSize(sze)
         prev.setMaximumSize(sze)
         #prev.setStyleSheet(cssButton)
 
         stop = QPushButton(QIcon(iconset['playback_stop']), "", self)
-        stop.setFocusPolicy(QtCore.Qt.NoFocus)
+        stop.setFocusPolicy(Qt.NoFocus)
         stop.clicked.connect(self.onStop.emit)
         stop.setMinimumSize(sze)
         stop.setMaximumSize(sze)
         #stop.setStyleSheet(cssButton)
 
         play = QPushButton(QIcon(iconset['playback_play']), "", self)
-        play.setFocusPolicy(QtCore.Qt.NoFocus)
+        play.setFocusPolicy(Qt.NoFocus)
         play.clicked.connect(self.onPlay.emit)
         play.setMinimumSize(sze)
         play.setMaximumSize(sze)
         #play.setStyleSheet(cssButton)
 
         nxt = QPushButton(QIcon(iconset['playback_next']), "", self)
-        nxt.setFocusPolicy(QtCore.Qt.NoFocus)
+        nxt.setFocusPolicy(Qt.NoFocus)
         nxt.clicked.connect(self.onNext.emit)
         nxt.setMinimumSize(sze)
         nxt.setMaximumSize(sze)
         #nxt.setStyleSheet(cssButton)
 
         mute = QPushButton(QIcon(iconset['playback_mute']), "", self)
-        mute.setFocusPolicy(QtCore.Qt.NoFocus)
+        mute.setFocusPolicy(Qt.NoFocus)
         mute.clicked.connect(self.onMute.emit)
         mute.setMinimumSize(sze)
         mute.setMaximumSize(sze)
         #mute.setStyleSheet(cssButton)
 
-        self.sldVol = QSlider(QtCore.Qt.Horizontal, self)
-        self.sldVol.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.sldVol = QSlider(Qt.Horizontal, self)
+        self.sldVol.setFocusPolicy(Qt.NoFocus)
         self.sldVol.valueChanged[int].connect(self.volChangeValue)
         self.sldVol.valueChanged[int].connect(self.onVolume.emit)
 
         self.tstart = QLabel("00:00", self)
 
-        sldTime = QSlider(QtCore.Qt.Horizontal, self)
-        sldTime.setFocusPolicy(QtCore.Qt.NoFocus)
+        sldTime = QSlider(Qt.Horizontal, self)
+        sldTime.setFocusPolicy(Qt.NoFocus)
         sldTime.valueChanged[int].connect(self.timeChangeValue)
         sldTime.valueChanged[int].connect(self.onTime.emit)
 
@@ -975,9 +975,9 @@ class QueueDialog(QDialog):
 
     def append(self, item):
         logger.info("queue append to model")
-        self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.model.append(item)
-        self.emit(QtCore.SIGNAL("layoutChanged()"))
+        self.emit(SIGNAL("layoutChanged()"))
 
     def onOk(self):
         ''' exit dialog with ok'''
@@ -1039,19 +1039,19 @@ class ID3Edit(QDialog):
         logger.info("cancel")
         self.close()
 
-class PlayerPhonon(QtCore.QObject):
+class PlayerPhonon(QObject):
     '''
         Handle for the Phonon class
     '''
     # tick for player
-    timeStart = QtCore.pyqtSignal(QtCore.QString)
-    timeTotal = QtCore.pyqtSignal(QtCore.QString)
-    timeScratched = QtCore.pyqtSignal(int)
-    volScratched = QtCore.pyqtSignal(int)
-    finishedSong = QtCore.pyqtSignal()
+    timeStart = pyqtSignal(QString)
+    timeTotal = pyqtSignal(QString)
+    timeScratched = pyqtSignal(int)
+    volScratched = pyqtSignal(int)
+    finishedSong = pyqtSignal()
 
     def __init__(self, parent):
-        QtCore.QObject.__init__(self, parent)
+        QObject.__init__(self, parent)
         self.player = Phonon.MediaObject(self)
         self.m_audio = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.player, self.m_audio)
