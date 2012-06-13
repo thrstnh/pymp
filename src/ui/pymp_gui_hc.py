@@ -81,9 +81,7 @@ iconset = _init_icon_set(iconset)
 
 
 class PympGUI(QMainWindow):
-    '''
-        MainWindow of the python music player (pymp)
-    '''
+
     def __init__(self):
         super(PympGUI, self).__init__()
 
@@ -98,32 +96,72 @@ class PympGUI(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        ''' TODO: init user interface'''
-
         # actions in a dict :)
         self.actionsDict = {
-                         'addCollection':  ['Add &Collection', 'Ctrl+Q', 'Add Collection', qApp.quit, iconset['new']],
-                         'newPlaylist':    ['New &Playlist', 'Ctrl+P', 'New Playlist', qApp.quit, iconset['new']],
-                         'openPlaylist':   ['Open Playlist', 'Ctrl+P', 'Open Playlist', qApp.quit, iconset['open']],
-                         'savePlaylist':   ['Save Playlist', 'Ctrl+P', 'Save Playlist', qApp.quit, iconset['save']],
-                         'viewCollection': ['View Collection', 'Ctrl+I', 'View Collection Panel', qApp.quit, iconset['cancel']],
-                         'viewLyric':      ['View Lyric', 'Ctrl+L', 'View Lyric Panel', qApp.quit, iconset['cancel']],
+                         'addCollection':  ['Add &Collection', 'Ctrl+Q', 'Add Collection',
+                                            qApp.quit,
+                                            iconset['new']],
+                         'newPlaylist':    ['New &Playlist', 'Ctrl+P', 'New Playlist',
+                                            qApp.quit,
+                                            iconset['new']],
+                         'openPlaylist':   ['Open Playlist', 'Ctrl+P', 'Open Playlist',
+                                            qApp.quit,
+                                            iconset['open']],
+                         'savePlaylist':   ['Save Playlist', 'Ctrl+P', 'Save Playlist',
+                                            qApp.quit,
+                                            iconset['save']],
+                         'viewCollection': ['View Collection', 'Ctrl+I', 'View Collection Panel',
+                                            qApp.quit,
+                                            iconset['cancel']],
+                         'viewLyric':      ['View Lyric', 'Ctrl+L', 'View Lyric Panel',
+                                            qApp.quit,
+                                            iconset['cancel']],
                          # ctrl actions
-                         'playback_ff':    ['FF', 'Ctrl+Q', 'Forward', qApp.quit, iconset['playback_ff']],
-                         'playback_next':  ['Next', 'Ctrl+Q', 'Next Track', qApp.quit, iconset['playback_next']],
-                         'playback_pause': ['Pause', 'Ctrl+Q', 'Pause', qApp.quit, iconset['playback_pause']],
-                         'playback_play':  ['Play', 'Ctrl+Q', 'Play', qApp.quit, iconset['playback_play']],
-                         'playback_prev':  ['Prev', 'Ctrl+Q', 'Prev', qApp.quit, iconset['playback_prev']],
-                         'playback_rew':   ['Rew', 'Ctrl+Q', 'Rew', qApp.quit, iconset['playback_rew']],
-                         'playback_stop':  ['Stop', 'Ctrl+Q', 'Stop', qApp.quit, iconset['playback_stop']],
-                         'playback_mute':  ['Mute', 'Ctrl+Q', 'Mute', qApp.quit, iconset['playback_mute']],
-                         'lookandfeel':    ['look and feel', 'Ctrl+F', 'Change look and feel', self.lookandfeel, iconset['lookandfeel']],
-                         'shuffle':        ['shuffle', 'Ctrl+F', 'shuffle true/false', self.defAction, iconset['random_f']],
-                         'repeat':         ['repeat', 'Ctrl+F', 'repeat true/false', self.defAction, iconset['repeat_f']],
-                         'clear':          ['clear Playlist', 'Ctrl+F', 'clear playlist', self.defAction, iconset['clear']],
-                         'help':           ['help', 'Ctrl+F', 'help', qApp.quit, iconset['cancel']],
-                         'about':          ['About pymp', 'Ctrl+F', 'about', qApp.quit, iconset['cancel']],
-                         'exit':           ['Exit', 'Ctrl+Q', 'Exit Application', qApp.quit, iconset['exit']]}
+                         'playback_ff':    ['FF', 'Ctrl+Q', 'Forward',
+                                            qApp.quit,
+                                            iconset['playback_ff']],
+                         'playback_next':  ['Next', 'Ctrl+Q', 'Next Track',
+                                            qApp.quit,
+                                            iconset['playback_next']],
+                         'playback_pause': ['Pause', 'Ctrl+Q', 'Pause',
+                                            qApp.quit,
+                                            iconset['playback_pause']],
+                         'playback_play':  ['Play', 'Ctrl+Q', 'Play',
+                                            qApp.quit,
+                                            iconset['playback_play']],
+                         'playback_prev':  ['Prev', 'Ctrl+Q', 'Prev',
+                                            qApp.quit,
+                                            iconset['playback_prev']],
+                         'playback_rew':   ['Rew', 'Ctrl+Q', 'Rew',
+                                            qApp.quit,
+                                            iconset['playback_rew']],
+                         'playback_stop':  ['Stop', 'Ctrl+Q', 'Stop',
+                                            qApp.quit,
+                                            iconset['playback_stop']],
+                         'playback_mute':  ['Mute', 'Ctrl+Q', 'Mute',
+                                            qApp.quit,
+                                            iconset['playback_mute']],
+                         'lookandfeel':    ['look and feel', 'Ctrl+F', 'Change look and feel',
+                                            self.lookandfeel,
+                                            iconset['lookandfeel']],
+                         'shuffle':        ['shuffle', 'Ctrl+F', 'shuffle true/false',
+                                            self.defAction,
+                                            iconset['random_f']],
+                         'repeat':         ['repeat', 'Ctrl+F', 'repeat true/false',
+                                            self.defAction,
+                                            iconset['repeat_f']],
+                         'clear':          ['clear Playlist', 'Ctrl+F', 'clear playlist',
+                                            self.defAction,
+                                            iconset['clear']],
+                         'help':           ['help', 'Ctrl+F', 'help',
+                                            qApp.quit,
+                                            iconset['cancel']],
+                         'about':          ['About pymp', 'Ctrl+F', 'about',
+                                            qApp.quit,
+                                            iconset['cancel']],
+                         'exit':           ['Exit', 'Ctrl+Q', 'Exit Application',
+                                            qApp.quit,
+                                            iconset['exit']]}
 
         # compute actions-dict
         for (k,v) in self.actionsDict.items():
@@ -135,10 +173,21 @@ class PympGUI(QMainWindow):
         viewMenu = menubar.addMenu('&View')
         playbackMenu = menubar.addMenu('&Playback')
         helpMenu = menubar.addMenu('&Help')
-        [fileMenu.addAction(self.actions[k]) for k in ['addCollection', 'newPlaylist', 'openPlaylist', 'savePlaylist', 'exit']]
-        [viewMenu.addAction(self.actions[k]) for k in ['help', 'viewLyric', 'lookandfeel']]
-        [playbackMenu.addAction(self.actions[k]) for k in ['shuffle']]
-        [helpMenu.addAction(self.actions[k]) for k in ['viewCollection', 'about']]
+        [fileMenu.addAction(self.actions[k])
+                for k in ['addCollection',
+                          'newPlaylist',
+                          'openPlaylist',
+                          'savePlaylist',
+                          'exit']]
+        [viewMenu.addAction(self.actions[k])
+                for k in ['help',
+                          'viewLyric',
+                          'lookandfeel']]
+        [playbackMenu.addAction(self.actions[k])
+                for k in ['shuffle']]
+        [helpMenu.addAction(self.actions[k])
+                for k in ['viewCollection',
+                          'about']]
 
         self.statusBar()
         self.statusBar().showMessage('Ready')
@@ -157,8 +206,14 @@ class PympGUI(QMainWindow):
         self.left = QFrame(self)
         self.left.setFrameShape(QFrame.StyledPanel)
 
-        self.options.addAction(self.qtregister_action('toggle_collection', 'ctrl+t', 'toggle Collection status tip', self.toggleCollection, iconset['layout_lp']))
-        self.options.addAction(self.qtregister_action('toggle_lyrics', 'ctrl+l', 'toggle Lyrics status tip', self.toggleLyrics, iconset['layout_rp']))
+        self.options.addAction(
+                self.qtregister_action('toggle_collection', 'ctrl+t', 'toggle Collection status tip',
+                                        self.toggleCollection,
+                                        iconset['layout_lp']))
+        self.options.addAction(
+                self.qtregister_action('toggle_lyrics', 'ctrl+l', 'toggle Lyrics status tip',
+                                        self.toggleLyrics,
+                                        iconset['layout_rp']))
 
         self.center = QFrame(self)
         self.center.setFrameShape(QFrame.StyledPanel)
@@ -252,6 +307,7 @@ class PympGUI(QMainWindow):
         self.player.timeStart.connect(self.controlBar.setTimeStart)
         self.player.timeTotal.connect(self.controlBar.setTimeTotal)
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
+        self.player.volScratched.connect(self.controlBar.volChangeValue)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
         self.searchBarPlaylist.timerExpired.connect(self.plsPanel.usePattern)
         self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
@@ -261,6 +317,7 @@ class PympGUI(QMainWindow):
         self.player.finishedSong.connect(self.plsPanel.nextPath)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
         self.plsPanel.enqueue.connect(self.queuedlg.append)
+        self.controlBar.set_volume(75)  # TODO read from config
 
 
 class PlaylistPanel(QWidget):
@@ -476,9 +533,7 @@ class CollectionPanel(QWidget):
         self.tre.clicked.connect(self.clicked)
         #self.tre.activated.connect(self.activated)
         #self.tre.pressed.connect(self.pressed)
-
         self._dclick_timer.timeout.connect(self._dclick_timeout)
-
         vbox = QHBoxLayout(self)
         vbox.addWidget(self.tre, 1)
 
@@ -667,7 +722,6 @@ class TrackInfoBar(QWidget):
     def initUI(self):
         ''' TODO: init user interface '''
         self.customLabel = QLabel(self)
-
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.customLabel)
@@ -684,16 +738,12 @@ class TrackInfoBar(QWidget):
         self.track['year'] = mpfile.year
         self.track['tracknr'] = mpfile.trackno
         self.track['genre'] = mpfile.genre
-
         self.updateInformation()
         self.fetchLyrics.emit(self.track['artist'], self.track['title'])
 
     def updateInformation(self):
-        '''
-            sync vars with gui-labels
-        '''
+        ''' sync vars with gui-labels '''
         tx = '{artist}\t-\t{title}\n{album}\t({year},{tracknr}\t{genre})'.format(**self.track)
-#        tx = '%s\t-\t%s \n%s\t (%s, %s) \t %s' % (self.artist, self.title, self.album, self.year, self.tracknr, self.genre)
         self.customLabel.setText(tx)
 
 
@@ -825,10 +875,10 @@ class ControlBar(QWidget):
         mute.setMaximumSize(sze)
         #mute.setStyleSheet(cssButton)
 
-        sldVol = QSlider(QtCore.Qt.Horizontal, self)
-        sldVol.setFocusPolicy(QtCore.Qt.NoFocus)
-        sldVol.valueChanged[int].connect(self.volChangeValue)
-        sldVol.valueChanged[int].connect(self.onVolume.emit)
+        self.sldVol = QSlider(QtCore.Qt.Horizontal, self)
+        self.sldVol.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.sldVol.valueChanged[int].connect(self.volChangeValue)
+        self.sldVol.valueChanged[int].connect(self.onVolume.emit)
 
         self.tstart = QLabel("00:00", self)
 
@@ -845,7 +895,7 @@ class ControlBar(QWidget):
         hbox.addWidget(play)
         hbox.addWidget(nxt)
         hbox.addWidget(mute)
-        hbox.addWidget(sldVol)
+        hbox.addWidget(self.sldVol)
         hbox.addWidget(self.tstart)
         hbox.addWidget(sldTime, 1)
         hbox.addWidget(self.ttotal)
@@ -856,6 +906,9 @@ class ControlBar(QWidget):
     def setTimeTotal(self, time):
         self.ttotal.setText(time)
 
+    def set_volume(self, vol):
+        self.sldVol.setValue(vol)
+
     def volChangeValue(self, value):
         self._slider_changed('volume', value)
 
@@ -864,7 +917,7 @@ class ControlBar(QWidget):
 
     def _slider_changed(self, name, value):
         if value == 0:
-            ret = 'muted'
+            ret = 'min'
         elif value == 99:
             ret = 'max'
         else:
@@ -880,6 +933,7 @@ class ControlBar(QWidget):
 
 
 class QueueDialog(QDialog):
+
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.parent = parent
@@ -998,8 +1052,8 @@ class PlayerPhonon(QtCore.QObject):
 
     def __init__(self, parent):
         QtCore.QObject.__init__(self, parent)
-        self.player = Phonon.createPlayer(Phonon.MusicCategory)
-        self.m_audio = Phonon.AudioOutput(Phonon.MusicCategory, parent)
+        self.player = Phonon.MediaObject(self)
+        self.m_audio = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.player, self.m_audio)
         self.player.setTickInterval(100)
         # actions
@@ -1035,10 +1089,10 @@ class PlayerPhonon(QtCore.QObject):
 
     def volume(self, val):
         ''' TODO: slider changed value'''
+        self.volScratched.emit(val)
         val = float(val) / 100.
         #print dir(self.m_audio)
         self.m_audio.setVolume(val)
-        self.volScratched.emit(val)
 
     def time(self, val):
         ''' TODO: slider changed value'''
