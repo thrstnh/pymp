@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os.path
 #from pymp.config import cfg, RANDOM, DROP_ID
 #from wx.lib.pubsub import Publisher

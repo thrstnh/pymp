@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import sqlite3
 import time
 import os.path
-from pymp.config import cfg, DEBUG, DB_FILE, DROP_ID
-from pymp.config import tbl
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4 import QtCore
+#from PyQt4.QtCore import *
+#from PyQt4.QtGui import *
+from .config import cfg, DB_FILE, DROP_ID, tbl
 
 dbfp = cfg[DB_FILE]
 conn = sqlite3.connect(dbfp)
@@ -862,7 +860,7 @@ def qt_tree_dict(cid, pattern=''):
         for row in sqlc:
             retval = {}
             if row[0]:
-                retval['tpe1'] = QString(row[0])
+                retval['tpe1'] = QtCore.QString(row[0])
             else:
                 retval['tpe1'] = QtCore.QString("%1").arg('')
             if row[1]:

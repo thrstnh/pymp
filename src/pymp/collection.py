@@ -1,14 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
-from pymp.config import cfg, LOG_DIR, DB_FILE
-from pymp.mp3 import PMP3
-import pymp.sqldb
+import sqldb
 import time
 import threading
 import sqlite3
 from multiprocessing import Process, Pipe
+from .config import cfg, DB_FILE
+from .mp3 import PMP3
 
 __all__ = ["Collections"]
 
@@ -22,7 +19,7 @@ class Collections():
 
     def reload(self):
         self._collections = {}
-        self._collection_db = pymp.sqldb.get_collections()
+        self._collection_db = sqldb.get_collections()
         for k,v in self._collection_db.items():
             self.add(v['name'], v['path'])
 
@@ -81,7 +78,7 @@ class Collection():
         self._cw = None
 
     def _init_cid(self):
-        self._cid = pymp.sqldb.get_collection_id(self._name)
+        self._cid = sqldb.get_collection_id(self._name)
 
     @property
     def cid(self):
@@ -97,7 +94,7 @@ class Collection():
 
     @property
     def data_full(self):
-        return pymp.sqldb.filter(self.cid, u'',u'', [], {})
+        return sqldb.filter(self.cid, u'',u'', [], {})
 
     def reload(self):
         self._load()
