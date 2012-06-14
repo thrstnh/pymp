@@ -1,5 +1,8 @@
+import os
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from pymp import sqldb
+from pymp.collection import Collection
 from ..logger import init_logger
 from ..model.tree import myModel
 
@@ -103,3 +106,15 @@ class CollectionPanel(QWidget):
 
     def addCollection(self):
         logger.info('add collection')
+        path = unicode(QFileDialog.getExistingDirectory(
+                        self,
+                        'Choose dir',
+                        '',
+                        QFileDialog.ShowDirsOnly).toUtf8(), 'utf-8')
+        if not path or path == '/':
+            return False
+        cpath, cname = os.path.split(path)
+        col = {cname : path}
+        sqldb.init_collections(col)
+        c = Collection(cname,path)
+        c.rescan()
