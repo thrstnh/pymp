@@ -40,6 +40,7 @@ class CollectionPanel(QWidget):
         self._dclick_timer.timeout.connect(self._dclick_timeout)
         vbox = QHBoxLayout(self)
         vbox.addWidget(self.tre, 1)
+        self.setMinimumWidth(420)
 
     def usePattern(self, pattern):
         pattern = str(pattern).lower().strip()

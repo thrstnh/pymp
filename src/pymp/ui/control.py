@@ -19,6 +19,9 @@ class ControlBar(QWidget):
     onPlay = pyqtSignal()
     onVolume = pyqtSignal(int)
     onTime = pyqtSignal(int)
+    togLyric = pyqtSignal()
+    togCollection = pyqtSignal()
+    clearPlaylist = pyqtSignal()
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -34,7 +37,19 @@ class ControlBar(QWidget):
 
         #self.setStyleSheet(cssDEBUG)
 
-        sze = QSize(16, 16)
+        sze = QSize(24, 24)
+
+        togC = QPushButton(QIcon(iconset['layout_lp']), "", self)
+        togC.setFocusPolicy(Qt.NoFocus)
+        togC.clicked.connect(self.togCollection.emit)
+        togC.setMinimumSize(sze)
+        togC.setMaximumSize(sze)
+
+        togL = QPushButton(QIcon(iconset['layout_rp']), "", self)
+        togL.setFocusPolicy(Qt.NoFocus)
+        togL.clicked.connect(self.togLyric.emit)
+        togL.setMinimumSize(sze)
+        togL.setMaximumSize(sze)
 
         prev = QPushButton(QIcon(iconset['playback_rew']), "", self)
         prev.setFocusPolicy(Qt.NoFocus)
@@ -85,7 +100,15 @@ class ControlBar(QWidget):
 
         self.ttotal = QLabel("23:59", self)
 
+        clr = QPushButton(QIcon(iconset['clear']), "", self)
+        clr.setFocusPolicy(Qt.NoFocus)
+        clr.clicked.connect(self.clearPlaylist.emit)
+        clr.setMinimumSize(sze)
+        clr.setMaximumSize(sze)
+
         hbox = QHBoxLayout(self)
+        hbox.addWidget(togC)
+        hbox.addWidget(togL)
         hbox.addWidget(prev, 0)
         hbox.addWidget(stop, 0)
         hbox.addWidget(play)
@@ -95,6 +118,7 @@ class ControlBar(QWidget):
         hbox.addWidget(self.tstart)
         hbox.addWidget(sldTime, 1)
         hbox.addWidget(self.ttotal)
+        hbox.addWidget(clr)
 
     def setTimeStart(self, time):
         self.tstart.setText(time)

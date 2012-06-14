@@ -126,28 +126,11 @@ class PympGUI(QMainWindow):
         self.statusBar()
         self.statusBar().showMessage('Ready')
 
-        #self.toolbar = self.addToolBar('Exit')
-        self.options = self.addToolBar('Options')
-        #[self.toolbar.addAction(self.actions[_]) for _ in self.actionsDict.keys()]
-
-
-
         self.setGeometry(20, 20, 1220, 620)
         self.setWindowTitle('pymp')
 
-#        mainpanel = QWidget(self)
-
         self.left = QFrame(self)
         self.left.setFrameShape(QFrame.StyledPanel)
-
-        self.options.addAction(
-                self.qtregister_action('toggle_collection', 'ctrl+t', 'toggle Collection status tip',
-                                        self.toggleCollection,
-                                        iconset['layout_lp']))
-        self.options.addAction(
-                self.qtregister_action('toggle_lyrics', 'ctrl+l', 'toggle Lyrics status tip',
-                                        self.toggleLyrics,
-                                        iconset['layout_rp']))
 
         self.center = QFrame(self)
         self.center.setFrameShape(QFrame.StyledPanel)
@@ -166,7 +149,6 @@ class PympGUI(QMainWindow):
         self.lyricPanel = LyricPanel(self)
 
         hbox = QHBoxLayout(self)
-
         hbox.setSpacing(0)
         vboxCollection = QVBoxLayout(self)
         vboxCollection.addWidget(self.searchBarCollection)
@@ -183,6 +165,7 @@ class PympGUI(QMainWindow):
         vboxLyric = QVBoxLayout(self)
         vboxLyric.addWidget(self.lyricPanel, 1)
         self.right.setLayout(vboxLyric)
+        self.right.setVisible(False)
 
         splitterMain.addWidget(self.left)
         splitterMain.addWidget(self.center)
@@ -200,7 +183,7 @@ class PympGUI(QMainWindow):
     def toggleCollection(self):
         self.left.setVisible(not self.left.isVisible())
 
-    def toggleLyrics(self):
+    def toggleLyric(self):
         self.right.setVisible(not self.right.isVisible())
 
     def defAction(self):
@@ -230,6 +213,8 @@ class PympGUI(QMainWindow):
         # NOW init player, after gui shows up
         self.player = Player(self)
         # connect some actions
+        self.controlBar.togCollection.connect(self.toggleCollection)
+        self.controlBar.togLyric.connect(self.toggleLyric)
         self.controlBar.onPrev.connect(self.player.prev)
         self.controlBar.onStop.connect(self.player.stop)
         self.controlBar.onPlay.connect(self.player.play)
@@ -237,6 +222,7 @@ class PympGUI(QMainWindow):
         self.controlBar.onMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
+        self.controlBar.clearPlaylist.connect(self.plsPanel.clearPlaylist)
         self.plsPanel.playCurrent.connect(self.player.play)
         self.plsPanel.playCurrent.connect(self.trackInfo.update)
         self.plsPanel.playNext.connect(self.player.play)

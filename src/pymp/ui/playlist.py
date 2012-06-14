@@ -57,15 +57,8 @@ class PlaylistPanel(QWidget):
         hh = self.tbl.horizontalHeader()
         hh.setStretchLastSection(True)
 
-        self.toolbar = QToolBar('Clear Playlist')
-        ac = QAction(QIcon(iconset['clear']), "Clear Playlist", self)
-        ac.setStatusTip("Clear Playlist")
-        ac.triggered.connect(self.clearPlaylist)
-        self.toolbar.addAction(ac)
-
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.tbl, 1)
-        hbox.addWidget(self.toolbar)
 
         #vbox = QVBoxLayout(self)
 
