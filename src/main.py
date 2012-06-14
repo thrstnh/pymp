@@ -4,6 +4,7 @@ import sys
 from PyQt4 import QtGui
 from pymp.pymp import PympGUI
 
+sys.path.append('.')
 
 def main_hc():
     app = QtGui.QApplication(sys.argv)
