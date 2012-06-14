@@ -163,7 +163,6 @@ class PympGUI(QMainWindow):
         vboxPlaylist.addWidget(self.searchBarPlaylist)
         vboxPlaylist.addWidget(self.plsPanel, 1)
         vboxPlaylist.addWidget(self.trackInfo)
-        vboxPlaylist.addWidget(self.controlBar)
         self.center.setLayout(vboxPlaylist)
 
         vboxLyric = QVBoxLayout(self)
@@ -175,13 +174,17 @@ class PympGUI(QMainWindow):
         splitterMain.addWidget(self.center)
         splitterMain.addWidget(self.right)
 
-        hbox.addWidget(splitterMain)
-
         splitterMain.setStretchFactor(0, 1)
         splitterMain.setStretchFactor(1, 2)
         splitterMain.setStretchFactor(2, 1)
 
-        self.setCentralWidget(splitterMain)
+        vbox = QVBoxLayout(self)
+        vbox.addWidget(splitterMain, 1)
+        vbox.addWidget(self.controlBar)
+
+        layout = QFrame(self)
+        layout.setLayout(vbox)
+        self.setCentralWidget(layout)
         self.show()
 
     def toggleCollection(self):
