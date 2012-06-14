@@ -24,8 +24,8 @@ class PympGUI(QMainWindow):
         self.uistyleid = 0
         QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
         QApplication.setPalette(QApplication.style().standardPalette())
-        #cssStyle = "border: 1px solid black; padding: 1px;"
-        #self.setStyleSheet(cssStyle)
+        cssStyle = "border: 1px solid black; padding: 1px;"
+        self.setStyleSheet(cssStyle)
         self.queuedlg = QueueDialog(self)
         self.initUI()
 
@@ -135,7 +135,7 @@ class PympGUI(QMainWindow):
         self.setGeometry(20, 20, 1220, 620)
         self.setWindowTitle('pymp')
 
-        mainpanel = QWidget(self)
+#        mainpanel = QWidget(self)
 
         self.left = QFrame(self)
         self.left.setFrameShape(QFrame.StyledPanel)
@@ -221,6 +221,9 @@ class PympGUI(QMainWindow):
             self.uistyleid += 1
         QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
         QApplication.setPalette(QApplication.style().standardPalette())
+
+    def update_labels(self):
+        logger.info('update labels')
 
     def showEvent(self, arg1):
         ''' show user interface '''
