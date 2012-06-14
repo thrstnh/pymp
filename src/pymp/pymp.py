@@ -24,7 +24,11 @@ class PympGUI(QMainWindow):
         self.uistyleid = 0
         QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
         QApplication.setPalette(QApplication.style().standardPalette())
-        cssStyle = "border: 1px solid black; padding: 1px;"
+        cssStyle = '''QWidget {
+                border: 0px solid black;
+                padding: 0px;
+                margin: 0px;}
+        '''
         self.setStyleSheet(cssStyle)
         self.queuedlg = QueueDialog(self)
         self.initUI()
