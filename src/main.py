@@ -9,7 +9,7 @@ sys.path.append('.')
 def main_hc():
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('pymp')
-    pympgui = PympGUI()
+    PympGUI()
     sys.exit(app.exec_())
 
 
