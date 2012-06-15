@@ -48,8 +48,9 @@ class TrackInfoBar(QWidget):
         self.track['tracknr'] = mpfile.trackno
         self.track['genre'] = mpfile.genre
         self.updateInformation()
-        self.fetchLyrics.emit(self.track.get('artist', QString('')),
-                              self.track.get('title', QString('')))
+#        if self.track['artist'] and self.track['title']:
+#            self.fetchLyrics.emit(self.track.get('artist', QString('')),
+#                                  self.track.get('title', QString('')))
 
     def updateLabels(self):
         self._init()

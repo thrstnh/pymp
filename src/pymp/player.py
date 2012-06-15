@@ -24,17 +24,17 @@ class Player(QObject):
         self.player = Phonon.MediaObject(self)
         self.m_audio = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.player, self.m_audio)
-        self.player.setTickInterval(100)
+        #self.player.setTickInterval(100)
         # actions
-        self.player.tick.connect(self.tick)
+        #self.player.tick.connect(self._update_labels)
         self.player.finished.connect(self.finished)
 
         #print Phonon.BackendCapabilities.availableAudioEffects()
         # QSlider -> SeekSlider
         #self.slider_time = Phonon.SeekSlider(self.player, self)
 
-    def tick(self):
-        self._update_labels()
+#    def tick(self):
+#        self._update_labels()
 
     def play(self, cpath):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
