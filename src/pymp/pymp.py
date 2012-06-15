@@ -224,6 +224,7 @@ class PympGUI(QMainWindow):
         self.controlBar.togLyric.connect(self.toggleLyric)
         self.controlBar.onPrev.connect(self.player.prev)
         self.controlBar.onStop.connect(self.player.stop)
+        self.controlBar.onStop.connect(self.trackInfo.updateLabels)
         self.controlBar.onPlay.connect(self.player.play)
         self.controlBar.onNext.connect(self.plsPanel.nextPath)
         self.controlBar.onMute.connect(self.player.mute)

@@ -12,7 +12,10 @@ class TrackInfoBar(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+        self._init()
         self.initUI()
+
+    def _init(self):
         self.track = dict()
         self.track['artist'] = ''
         self.track['title'] = ''
@@ -33,6 +36,10 @@ class TrackInfoBar(QWidget):
         '''
             fill fields with data
         '''
+        if not qstr:
+            self._init()
+            self.updateInformation()
+            return
         mpfile = PMP3(qstr)
         self.track['artist'] = mpfile.artist
         self.track['title'] = mpfile.title
@@ -43,6 +50,10 @@ class TrackInfoBar(QWidget):
         self.updateInformation()
         self.fetchLyrics.emit(self.track.get('artist', QString('')),
                               self.track.get('title', QString('')))
+
+    def updateLabels(self):
+        self._init()
+        self.updateInformation()
 
     def updateInformation(self):
         ''' sync vars with gui-labels '''

@@ -42,6 +42,7 @@ class Player(QObject):
 
     def stop(self):
         self.player.stop()
+        self._update_labels()
 
     def nxt(self, cpath):
         logger.info("Player::next")
@@ -85,6 +86,10 @@ class Player(QObject):
             self.timeTotal.emit(handle_time(total_s))
             sld_val = cur_s / total_s * 100
             self.sldMove.emit(sld_val)
+        else:
+            self.timeStart.emit('')
+            self.timeTotal.emit('')
+            self.sldMove.emit(0)
 
     def finished(self):
         self.finishedSong.emit()
