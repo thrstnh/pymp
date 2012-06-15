@@ -29,7 +29,7 @@ class PympGUI(QMainWindow):
                 padding: 0px;
                 margin: 0px;}
         '''
-        self.setStyleSheet(cssStyle)
+#        self.setStyleSheet(cssStyle)
         self.queuedlg = QueueDialog(self)
         self.initUI()
 
@@ -236,6 +236,7 @@ class PympGUI(QMainWindow):
         self.plsPanel.playNext.connect(self.trackInfo.update)
         self.player.timeStart.connect(self.controlBar.setTimeStart)
         self.player.timeTotal.connect(self.controlBar.setTimeTotal)
+        self.player.sldMove.connect(self.controlBar.set_time)
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.player.volScratched.connect(self.controlBar.volChangeValue)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)

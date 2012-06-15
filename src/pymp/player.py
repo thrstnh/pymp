@@ -14,6 +14,7 @@ class Player(QObject):
     # tick for player
     timeStart = pyqtSignal(QString)
     timeTotal = pyqtSignal(QString)
+    sldMove = pyqtSignal(int)
     timeScratched = pyqtSignal(int)
     volScratched = pyqtSignal(int)
     finishedSong = pyqtSignal()
@@ -25,12 +26,15 @@ class Player(QObject):
         Phonon.createPath(self.player, self.m_audio)
         self.player.setTickInterval(100)
         # actions
-#        self.player.tick.connect(self.tick)
+        self.player.tick.connect(self.tick)
         self.player.finished.connect(self.finished)
 
         #print Phonon.BackendCapabilities.availableAudioEffects()
         # QSlider -> SeekSlider
         #self.slider_time = Phonon.SeekSlider(self.player, self)
+
+    def tick(self):
+        self._update_labels()
 
     def play(self, cpath):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
@@ -71,7 +75,7 @@ class Player(QObject):
         else:
             logger.info("not playing... {}".format(val))
 
-    def _updateLabels(self):
+    def _update_labels(self):
         cur_s = 0
         total_s = 0
         if self.player and self.player.state() == Phonon.PlayingState:
@@ -79,6 +83,8 @@ class Player(QObject):
             self.timeStart.emit(handle_time(cur_s))
             total_s = self.player.totalTime() / 1000.
             self.timeTotal.emit(handle_time(total_s))
+            sld_val = cur_s / total_s * 100
+            self.sldMove.emit(sld_val)
 
     def finished(self):
         self.finishedSong.emit()

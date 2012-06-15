@@ -93,10 +93,10 @@ class ControlBar(QWidget):
 
         self.tstart = QLabel("00:00", self)
 
-        sldTime = QSlider(Qt.Horizontal, self)
-        sldTime.setFocusPolicy(Qt.NoFocus)
-        sldTime.valueChanged[int].connect(self.timeChangeValue)
-        sldTime.valueChanged[int].connect(self.onTime.emit)
+        self.sldTime = QSlider(Qt.Horizontal, self)
+        self.sldTime.setFocusPolicy(Qt.NoFocus)
+        self.sldTime.valueChanged[int].connect(self.timeChangeValue)
+        self.sldTime.valueChanged[int].connect(self.onTime.emit)
 
         self.ttotal = QLabel("23:59", self)
 
@@ -116,7 +116,7 @@ class ControlBar(QWidget):
         hbox.addWidget(mute)
         hbox.addWidget(self.sldVol)
         hbox.addWidget(self.tstart)
-        hbox.addWidget(sldTime, 1)
+        hbox.addWidget(self.sldTime, 1)
         hbox.addWidget(self.ttotal)
         hbox.addWidget(clr)
 
@@ -128,6 +128,9 @@ class ControlBar(QWidget):
 
     def set_volume(self, vol):
         self.sldVol.setValue(vol)
+
+    def set_time(self, t):
+        self.sldTime.setValue(t)
 
     def volChangeValue(self, value):
         self._slider_changed('volume', value)
