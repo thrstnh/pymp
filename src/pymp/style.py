@@ -38,6 +38,7 @@ iconsetDefault = {
            "playback_rew": 'playback_rew.png',
            "playback_stop": 'playback_stop.png',
            "playback_mute": 'speaker.png',
+           "playback_mute_t": 'speaker_off.png',
            "pymp": 'pymp.png',
            "random_f": 'random_f.png',
            "random_t": 'random_t.png',

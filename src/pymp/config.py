@@ -35,8 +35,8 @@ class PympEnv(PropertyDict):
             'DEBUG',
             'FILE_DB',
             'DIR_ROOT', 'DIR_LOG', 'DIR_LYRICS',
-            'RANDOM', 'REPEAT',
-            'SHOW_LYRICS', 'SHOW_COLLECTION',
+            'RANDOM', 'REPEAT', 'MUTE',
+            'SHOW_LYRIC', 'SHOW_COLLECTION',
             'LFM_LOGIN', 'LFM_SCROBBLE', 'LFM_NOW_PLAYING',
             'COLLECTION_CURRENT',
             'DROP_ID',
@@ -55,7 +55,8 @@ class PympEnv(PropertyDict):
         self['DIR_LYRICS'] = join(ROOT_DIR, 'lyrics')
         self['RANDOM'] = False
         self['REPEAT'] = False
-        self['SHOW_LYRICS'] = False
+        self['MUTE'] = False
+        self['SHOW_LYRIC'] = False
         self['SHOW_COLLECTION'] = True
         self['LFM_LOGIN'] = False
         self['LFM_SCROBBLE'] = False
@@ -69,6 +70,19 @@ class PympEnv(PropertyDict):
     def change_iconset(self, name, path):
         self['ICONSET_NAME'] = name
         self['ICONSET_PATH'] = path
+
+    def _toggle(self, key):
+        logger.info(':tog {} -> {}'.format(key, self[key]))
+        self[key] = not self[key]
+
+    def toggle_mute(self):
+        self._toggle('MUTE')
+
+    def toggle_lyric(self):
+        self._toggle('SHOW_LYRIC')
+
+    def toggle_collection(self):
+        self._toggle('SHOW_COLLECTION')
 
     def _save(self):
         # TODO

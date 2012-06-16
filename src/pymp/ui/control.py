@@ -1,9 +1,12 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from .widgets import BaseButton, ToggleButton
 from ..logger import init_logger
 from ..style import iconset
+from ..config import init_env
 
 logger = init_logger()
+PYMPENV = init_env()
 
 
 class ControlBar(QWidget):
@@ -15,12 +18,12 @@ class ControlBar(QWidget):
     onStop = pyqtSignal()
     onPlay = pyqtSignal()
     onNext = pyqtSignal()
-    onMute = pyqtSignal()
     onPlay = pyqtSignal()
     onVolume = pyqtSignal(int)
     onTime = pyqtSignal(int)
     togLyric = pyqtSignal()
     togCollection = pyqtSignal()
+    togMute = pyqtSignal()
     clearPlaylist = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -29,7 +32,6 @@ class ControlBar(QWidget):
 
     def initUI(self):
         ''' TODO: init user interface'''
-        pref = '../data/'
         cssButton = "border-style: flat; border-width: 0px; border-color: black;"
         cssDEBUG = "background-color: black; border-style: flat; border-width: 0px; border-color: black;"
 
@@ -39,52 +41,16 @@ class ControlBar(QWidget):
 
         sze = QSize(24, 24)
 
-        togC = QPushButton(QIcon(iconset['layout_lp']), "", self)
-        togC.setFocusPolicy(Qt.NoFocus)
-        togC.clicked.connect(self.togCollection.emit)
-        togC.setMinimumSize(sze)
-        togC.setMaximumSize(sze)
-
-        togL = QPushButton(QIcon(iconset['layout_rp']), "", self)
-        togL.setFocusPolicy(Qt.NoFocus)
-        togL.clicked.connect(self.togLyric.emit)
-        togL.setMinimumSize(sze)
-        togL.setMaximumSize(sze)
-
-        prev = QPushButton(QIcon(iconset['playback_rew']), "", self)
-        prev.setFocusPolicy(Qt.NoFocus)
-        prev.clicked.connect(self.onPrev.emit)
-        prev.setMinimumSize(sze)
-        prev.setMaximumSize(sze)
-        #prev.setStyleSheet(cssButton)
-
-        stop = QPushButton(QIcon(iconset['playback_stop']), "", self)
-        stop.setFocusPolicy(Qt.NoFocus)
-        stop.clicked.connect(self.onStop.emit)
-        stop.setMinimumSize(sze)
-        stop.setMaximumSize(sze)
-        #stop.setStyleSheet(cssButton)
-
-        play = QPushButton(QIcon(iconset['playback_play']), "", self)
-        play.setFocusPolicy(Qt.NoFocus)
-        play.clicked.connect(self.onPlay.emit)
-        play.setMinimumSize(sze)
-        play.setMaximumSize(sze)
-        #play.setStyleSheet(cssButton)
-
-        nxt = QPushButton(QIcon(iconset['playback_next']), "", self)
-        nxt.setFocusPolicy(Qt.NoFocus)
-        nxt.clicked.connect(self.onNext.emit)
-        nxt.setMinimumSize(sze)
-        nxt.setMaximumSize(sze)
-        #nxt.setStyleSheet(cssButton)
-
-        mute = QPushButton(QIcon(iconset['playback_mute']), "", self)
-        mute.setFocusPolicy(Qt.NoFocus)
-        mute.clicked.connect(self.onMute.emit)
-        mute.setMinimumSize(sze)
-        mute.setMaximumSize(sze)
-        #mute.setStyleSheet(cssButton)
+        togC = ToggleButton(PYMPENV['SHOW_COLLECTION'], self.togCollection.emit,
+                            iconset['layout_lm'], iconset['layout_lp'])
+        togL = ToggleButton(PYMPENV['SHOW_LYRIC'], self.togLyric.emit,
+                            iconset['layout_rm'], iconset['layout_rp'])
+        prev = BaseButton(self.onPrev.emit, iconset['playback_rew'])
+        stop = BaseButton(self.onStop.emit, iconset['playback_stop'])
+        play = BaseButton(self.onPlay.emit, iconset['playback_play'])
+        nxt = BaseButton(self.onNext.emit, iconset['playback_next'])
+        mute = ToggleButton(PYMPENV['MUTE'], self.togMute.emit,
+                            iconset['playback_mute_t'], iconset['playback_mute'])
 
         self.sldVol = QSlider(Qt.Horizontal, self)
         self.sldVol.setFocusPolicy(Qt.NoFocus)

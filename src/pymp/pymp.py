@@ -211,6 +211,10 @@ class PympGUI(QMainWindow):
     def update_labels(self):
         logger.info('update labels')
 
+    def _handle_play(self):
+        logger.info('_handle_play')
+        self.player.play(self.plsPanel.nextPath())
+
     def showEvent(self, arg1):
         ''' show user interface '''
         # NOW init player, after gui shows up
@@ -221,9 +225,9 @@ class PympGUI(QMainWindow):
         self.controlBar.onPrev.connect(self.player.prev)
         self.controlBar.onStop.connect(self.player.stop)
         self.controlBar.onStop.connect(self.trackInfo.updateLabels)
-        self.controlBar.onPlay.connect(self.player.play)
+        self.controlBar.onPlay.connect(self._handle_play)
         self.controlBar.onNext.connect(self.plsPanel.nextPath)
-        self.controlBar.onMute.connect(self.player.mute)
+        self.controlBar.togMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
         self.controlBar.clearPlaylist.connect(self.plsPanel.clearPlaylist)
