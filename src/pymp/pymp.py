@@ -129,7 +129,7 @@ class PympGUI(QMainWindow):
 
         self.statusBar()
         self.statusBar().showMessage('Ready')
-
+        self.setWindowIcon(QIcon(iconset['pymp']))
         self.setGeometry(20, 20, 1220, 620)
         self.setWindowTitle('pymp')
 
