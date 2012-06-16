@@ -304,7 +304,7 @@ class myModel(QAbstractItemModel):
         album = myNode('Album n', 'on', 'album', 'ALBUM', artist)
         track = myNode('Track n', 'on', 'track', 'track', album)
         '''
-        self.root = myNode('root', 'on', 'this is root', 'ROOT', None)
+        self.root = myNode('ROOT', 'on', 'this is root', 'ROOT', None)
         self.__tree = {}
         cols = self.collections.get_collections()
         for cid, v in cols.items():
