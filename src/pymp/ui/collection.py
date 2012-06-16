@@ -45,7 +45,7 @@ class CollectionPanel(QWidget):
         vbox.addWidget(self.tre, 1)
         self.setMinimumWidth(280)
 
-    def usePattern(self, pattern):
+    def usePattern(self, pattern=''):
         pattern = str(pattern).lower().strip()
         self.model.reset()
         self.model.setPattern(pattern)
@@ -96,16 +96,37 @@ class CollectionPanel(QWidget):
     def popup(self, point):
         mindex = self.tre.indexAt(point)
         self.node = self.model.nodeFromIndex(mindex)
-        data = self.node.data
+        self.current_collection_name = self.node.name
+        logger.info('collection:popup: {}'.format(self.current_collection_name))
 
         toolb = QToolBar(self.tre)
         popMenu = QMenu(self.tre)
-        actionNew = toolb.addAction('Collection::ADD', self.addCollection)
-        popMenu.addAction(actionNew)
+        popMenu.addAction(
+                toolb.addAction('Collection::ADD',
+                                self.addCollection))
+        def _not_root():
+            return self.current_collection_name != 'ROOT'
+
+        if _not_root():
+            if self.model.collection_is_scanning(self.current_collection_name):
+                popMenu.addAction(
+                        toolb.addAction('Collection::STOP RESCAN',
+                                        self.rescanCollectionStop))
+            else:
+                popMenu.addAction(
+                        toolb.addAction('Collection::RESCAN',
+                                        self.rescanCollection))
+        if _not_root():
+            popMenu.addAction(
+                    toolb.addAction('Collection::DELETE',
+                                    self.deleteCollection))
+        popMenu.addAction(
+                    toolb.addAction('reload',
+                                    self.initUI))
         popMenu.exec_(self.tre.mapToGlobal(point))
 
     def addCollection(self):
-        logger.info('add collection')
+        logger.info('collection:add: {}'.format(self.current_collection_name))
         path = unicode(QFileDialog.getExistingDirectory(
                         self,
                         'Choose dir',
@@ -118,3 +139,15 @@ class CollectionPanel(QWidget):
         sqldb.init_collections(col)
         c = Collection(cname,path)
         c.rescan()
+
+    def rescanCollection(self):
+        logger.info('collection:rescan: {}'.format(self.current_collection_name))
+        self.model.collection_rescan(self.current_collection_name)
+
+    def rescanCollectionStop(self):
+        logger.info('collection:rescan:stop: {}'.format(self.current_collection_name))
+        self.model.collection_rescan_stop(self.current_collection_name)
+
+    def deleteCollection(self):
+        logger.info('collection:delete: {}'.format(self.current_collection_name))
+        self.model.collection_delete(self.current_collection_name)
