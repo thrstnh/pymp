@@ -3,7 +3,7 @@ import pymp.sqldb
 from random import randint
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from ..config import tbl
+from ..config import TABLE_OPTIONS
 
 __all__ = ["myQTableView", "MyTableModel"]
 
@@ -75,7 +75,7 @@ class MyTableModel(QAbstractTableModel):
     def _init_tbl_columns(self):
         keys = []
         data = []
-        for k,v in tbl.items():
+        for k,v in TABLE_OPTIONS.items():
             if v[0]:
                 data.append((v[1], v[2]))
                 keys.append((v[1], k))

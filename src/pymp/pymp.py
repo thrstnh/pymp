@@ -1,6 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from .style import iconset
+from .style import iconset, css
 from .player import Player
 from .ui.control import ControlBar
 from .ui.playlist import PlaylistPanel
@@ -10,9 +10,10 @@ from .ui.trackinfo import TrackInfoBar
 from .ui.search import SearchBar
 from .ui.queue import QueueDialog
 from .logger import init_logger
+from .config import init_env
 
 logger = init_logger()
-
+PYMPENV = init_env()
 
 class PympGUI(QMainWindow):
 
@@ -24,12 +25,7 @@ class PympGUI(QMainWindow):
         self.uistyleid = 0
         QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
         QApplication.setPalette(QApplication.style().standardPalette())
-        cssStyle = '''QWidget {
-                border: 0px solid black;
-                padding: 0px;
-                margin: 0px;}
-        '''
-#        self.setStyleSheet(cssStyle)
+#        self.setStyleSheet(css)
         self.queuedlg = QueueDialog(self)
         self.initUI()
 

@@ -3,9 +3,10 @@ import lyricwiki
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from .logger import init_logger
-from .config import cfg as PYMPCFG, LYRICS_DIR
+from .config import init_env
 
 logger = init_logger()
+PYMPENV = init_env()
 
 
 class LyricWorker(QThread):
@@ -46,7 +47,7 @@ class LyricWorker(QThread):
         '''
             read lyrics from lyric-dir
         '''
-        fp = os.path.join(PYMPCFG[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
+        fp = os.path.join(PYMPENV[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
         try:
             with open(fp, 'r') as f:
                 lyr = f.read()
@@ -59,6 +60,6 @@ class LyricWorker(QThread):
         '''
             save lyrics to lyric-dir for offline lyrics
         '''
-        fp = os.path.join(PYMPCFG[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
+        fp = os.path.join(PYMPENV['DIR_LYRICS'], "%s-%s.txt" % (self.artist, self.title))
         with open(fp, 'w') as f:
             f.write(lyr.encode('utf-8'))

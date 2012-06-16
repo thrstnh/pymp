@@ -4,10 +4,11 @@ import time
 import threading
 import sqlite3
 from multiprocessing import Process, Pipe
-from .config import cfg, DB_FILE
+from .config import init_env
 from .mp3 import PMP3
 
 __all__ = ["Collections"]
+PYMPENV = init_env()
 
 
 class Collections():
@@ -195,7 +196,7 @@ class CollectionWorkerProcess(object):
 
     def start(self):
         self._start_time = time.time()
-        self.conn = sqlite3.connect(cfg[DB_FILE])
+        self.conn = sqlite3.connect(PYMPENV['FILE_DB'])
         self.sqlc = self.conn.cursor()
         self.rescan()
         self.conn.close()

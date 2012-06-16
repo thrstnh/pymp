@@ -1,6 +1,11 @@
 import os
+from .logger import init_logger
+from .config import init_env
 
-_pref = 'pymp/icons/iconsets/default/'
+__all__ = ['iconset', 'css_style']
+logger = init_logger()
+PYMPENV = init_env()
+
 
 iconsetDefault = {
            "arr_down": 'arr_down.png',
@@ -47,11 +52,18 @@ iconsetDefault = {
            "warning": 'warning.png',
            "lookandfeel": 'warning.png'}
 
+
 def _init_icon_set(icons):
-    print('init icon set')
+    logger.info('init_icon_set')
     ret = {}
     for k, v in icons.items():
-        ret[k] = os.path.join(_pref, v)
+        ret[k] = os.path.join(PYMPENV['ICONSET_PATH'], v)
     return ret
 
 iconset = _init_icon_set(iconsetDefault)
+
+css = '''QWidget {
+                border: 0px solid black;
+                padding: 0px;
+                margin: 0px;}
+'''

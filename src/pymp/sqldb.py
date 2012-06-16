@@ -6,11 +6,15 @@ import os.path
 from PyQt4 import QtCore
 #from PyQt4.QtCore import *
 #from PyQt4.QtGui import *
-from .config import cfg, DB_FILE, DROP_ID, tbl
+#from .config import cfg, DB_FILE, DROP_ID, tbl
+from .config import init_env
 
-dbfp = cfg[DB_FILE]
+
+PYMPENV = init_env()
+dbfp = PYMPENV['FILE_DB']
 conn = sqlite3.connect(dbfp)
 sqlc = conn.cursor()
+
 
 
 def now():
@@ -912,7 +916,7 @@ def qt_tree_dict(cid, pattern=''):
 
 
 def play_track(tid=0):
-    if tid > 0 and tid < cfg[DROP_ID]:
+    if tid > 0 and tid < PYMPENV['DROP_ID']:
         sql = u'''INSERT INTO played (track_id, played)
                     VALUES (?, ?)'''
         try:
