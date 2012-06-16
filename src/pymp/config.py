@@ -53,7 +53,7 @@ class PympEnv(PropertyDict):
         self['DIR_ROOT'] = ROOT_DIR
         self['DIR_LOG'] = join(ROOT_DIR, 'log')
         self['DIR_LYRICS'] = join(ROOT_DIR, 'lyrics')
-        self['RANDOM'] = False
+        self['RANDOM'] = True
         self['REPEAT'] = False
         self['MUTE'] = False
         self['SHOW_LYRIC'] = False

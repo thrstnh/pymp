@@ -12,7 +12,7 @@ class BaseButton(QPushButton):
         self.setMinimumSize(sze)
         self.setMaximumSize(sze)
         self.setIcon(QIcon(image))
-
+        self.setStyleSheet('border: 0px solid #000000;')
 
 class ToggleButton(BaseButton):
 

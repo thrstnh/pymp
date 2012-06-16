@@ -21,6 +21,7 @@ class ControlBar(QWidget):
     onPlay = pyqtSignal()
     onVolume = pyqtSignal(int)
     onTime = pyqtSignal(int)
+    onShuffle = pyqtSignal()
     togFocus = pyqtSignal()
     togLyric = pyqtSignal()
     togCollection = pyqtSignal()
@@ -34,16 +35,6 @@ class ControlBar(QWidget):
         self.initUI()
 
     def initUI(self):
-        ''' TODO: init user interface'''
-        cssButton = "border-style: flat; border-width: 0px; border-color: black;"
-        cssDEBUG = "background-color: black; border-style: flat; border-width: 0px; border-color: black;"
-
-        #cssButton = cssDEBUG
-
-        #self.setStyleSheet(cssDEBUG)
-
-        sze = QSize(24, 24)
-
         togC = ToggleButton(PYMPENV['SHOW_COLLECTION'], self.togCollection.emit,
                             iconset['layout_lm'], iconset['layout_lp'])
         togL = ToggleButton(PYMPENV['SHOW_LYRIC'], self.togLyric.emit,
@@ -52,6 +43,7 @@ class ControlBar(QWidget):
         stop = BaseButton(self.onStop.emit, iconset['playback_stop'])
         play = BaseButton(self.onPlay.emit, iconset['playback_play'])
         nxt = BaseButton(self.onNext.emit, iconset['playback_next'])
+        shuffle = BaseButton(self.onShuffle.emit, iconset['shuffle'])
         focus = ToggleButton(PYMPENV['AUTO_FOCUS'], self.togFocus.emit,
                             iconset['focus_t'], iconset['focus_f'])
         random = ToggleButton(PYMPENV['RANDOM'], self.togRandom.emit,
@@ -75,11 +67,7 @@ class ControlBar(QWidget):
 
         self.ttotal = QLabel("23:59", self)
 
-        clr = QPushButton(QIcon(iconset['clear']), "", self)
-        clr.setFocusPolicy(Qt.NoFocus)
-        clr.clicked.connect(self.clearPlaylist.emit)
-        clr.setMinimumSize(sze)
-        clr.setMaximumSize(sze)
+        clr = BaseButton(self.clearPlaylist.emit, iconset['clear'])
 
         hbox = QHBoxLayout(self)
         hbox.addWidget(togC)
@@ -88,6 +76,7 @@ class ControlBar(QWidget):
         hbox.addWidget(stop, 0)
         hbox.addWidget(play)
         hbox.addWidget(nxt)
+        hbox.addWidget(shuffle)
         hbox.addWidget(mute)
         hbox.addWidget(random)
         hbox.addWidget(repeat)

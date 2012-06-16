@@ -1,6 +1,6 @@
+import random
 import operator
 import pymp.sqldb
-from random import randint
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ..config import TABLE_OPTIONS
@@ -70,6 +70,11 @@ class MyTableModel(QAbstractTableModel):
     def length(self):
         return len(self.arraydata)
 
+    def shuffle(self):
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        random.shuffle(self.arraydata)
+        self.emit(SIGNAL("layoutChanged()"))
+
     def clear(self):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.arraydata = []
@@ -94,7 +99,7 @@ class MyTableModel(QAbstractTableModel):
 #        print "arraydata: ", self.arraydata
 
     def nxt(self):
-        n = randint(0, self.row_length()-1)
+        n = random.randint(0, self.row_length()-1)
         return n
 
     def rowCount(self, parent):

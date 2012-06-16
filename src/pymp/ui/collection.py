@@ -16,6 +16,7 @@ class CollectionPanel(QWidget):
     def __init__(self, parent=None, playlist=None):
         QWidget.__init__(self, parent)
         self.playlist = playlist
+        self.parent = parent
         self._dclick_timer = QTimer(self)
         self.initUI()
 
@@ -75,6 +76,7 @@ class CollectionPanel(QWidget):
                 self.playlist.append(node.data)
             else:
                 self._add_child_nodes(self.model.nodeFromIndex(index))
+            self.parent.update_statusbar()
         else:
             self._dclick_timer.start(300)
 

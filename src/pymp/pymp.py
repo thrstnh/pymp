@@ -211,6 +211,11 @@ class PympGUI(QMainWindow):
     def update_labels(self):
         logger.info('update labels')
 
+    def update_statusbar(self, msg=''):
+        if not msg:
+            msg = '{} tracks.'.format(self.plsPanel.model.length())
+        self.statusBar().showMessage(msg)
+
     def _handle_random(self):
         PYMPENV.toggle('RANDOM')
 
@@ -234,6 +239,7 @@ class PympGUI(QMainWindow):
         self.controlBar.onStop.connect(self.trackInfo.updateLabels)
         self.controlBar.onPlay.connect(self.plsPanel.current_path)
         self.controlBar.onNext.connect(self.plsPanel.next_path)
+        self.controlBar.onShuffle.connect(self.plsPanel.model.shuffle)
         self.controlBar.togMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
@@ -258,5 +264,6 @@ class PympGUI(QMainWindow):
         # IF REPEAT...
         self.player.finishedSong.connect(self.plsPanel.next_path)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
+        self.plsPanel.usePattern('')
         self.plsPanel.enqueue.connect(self.queuedlg.append)
         self.controlBar.set_volume(75)  # TODO read from config
