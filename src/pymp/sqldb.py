@@ -4,13 +4,11 @@ import sqlite3
 import time
 import os.path
 from PyQt4 import QtCore
-#from PyQt4.QtCore import *
-#from PyQt4.QtGui import *
-#from .config import cfg, DB_FILE, DROP_ID, tbl
-from .config import init_env
-
+from .config import init_env, TABLE_OPTIONS
+from .logger import init_logger
 
 PYMPENV = init_env()
+logger = init_logger()
 dbfp = PYMPENV['FILE_DB']
 conn = sqlite3.connect(dbfp)
 sqlc = conn.cursor()
@@ -340,7 +338,7 @@ def _format_time(t):
 
 def _init_tbl_columns():
     columns = []
-    for k,v in tbl.items():
+    for k,v in TABLE_OPTIONS.items():
         if v[0]:
             columns.append((v[1], k))
     return [hdr for (id,hdr) in sorted(columns)]
@@ -540,6 +538,7 @@ def qt_model_filter(cid, path, pattern, ids, kwargs):
             sql += '     OR genre.tcon LIKE "%' + pattern + '%") \n'
     #print sql
     try:
+        logger.debug('\n{}\n{}'.format(sql, params))
         sqlc.execute(sql, params)
         for row in sqlc:
             td = []

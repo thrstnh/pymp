@@ -257,13 +257,12 @@ class PympGUI(QMainWindow):
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.player.volScratched.connect(self.controlBar.volChangeValue)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
-        self.searchBarPlaylist.timerExpired.connect(self.plsPanel.usePattern)
-        self.searchBarPlaylist.clearSearch.connect(self.plsPanel.usePattern)
+        self.searchBarPlaylist.clearSearch.connect(self.plsPanel.search)
+        self.searchBarPlaylist.timerExpired.connect(self.plsPanel.search)
         self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
         self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
         # IF REPEAT...
         self.player.finishedSong.connect(self.plsPanel.next_path)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
-        self.plsPanel.usePattern('')
         self.plsPanel.enqueue.connect(self.queuedlg.append)
         self.controlBar.set_volume(75)  # TODO read from config

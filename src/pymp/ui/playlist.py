@@ -41,7 +41,7 @@ class PlaylistPanel(QWidget):
         self.tbl.setModel(self.model)
         self.tbl.setShowGrid(False)
         self.tbl.setColumnHidden(0, True)
-        self.tbl.setColumnHidden(self.model.column_length()-1, True)
+        self.tbl.setColumnHidden(self.model.columnCount(None)-1, True)
         self.tbl.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tbl.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -99,7 +99,7 @@ class PlaylistPanel(QWidget):
     def clearPlaylist(self):
         self.model.clear()
 
-    def usePattern(self, pattern):
+    def search(self, pattern):
         tstart = time.time()
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()]
@@ -113,8 +113,6 @@ class PlaylistPanel(QWidget):
                     self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
                     self.tbl.emit(SIGNAL("layoutChanged()"))
-                    continue
-
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.row_length()))
         self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.tbl.resizeRowsToContents()

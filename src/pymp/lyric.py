@@ -47,7 +47,7 @@ class LyricWorker(QThread):
         '''
             read lyrics from lyric-dir
         '''
-        fp = os.path.join(PYMPENV[LYRICS_DIR], "%s-%s.txt" % (self.artist, self.title))
+        fp = os.path.join(PYMPENV['DIR_LYRICS'], "%s-%s.txt" % (self.artist, self.title))
         try:
             with open(fp, 'r') as f:
                 lyr = f.read()

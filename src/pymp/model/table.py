@@ -8,7 +8,7 @@ from ..logger import init_logger
 
 logger = init_logger()
 
-__all__ = ["myQTableView", "MyTableModel"]
+__all__ = ['myQTableView', 'MyTableModel']
 
 
 class myQTableView(QTableView):
@@ -68,7 +68,7 @@ class MyTableModel(QAbstractTableModel):
         return self.length() > 0
 
     def length(self):
-        return len(self.arraydata)
+        return len(self.arraydata) or 1
 
     def shuffle(self):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
@@ -79,9 +79,6 @@ class MyTableModel(QAbstractTableModel):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.arraydata = []
         self.emit(SIGNAL("layoutChanged()"))
-
-    def _init_tbl_test_data(self):
-        return pymp.sqldb.qt_model_filter(1, '', '', [], {})
 
     def _init_tbl_columns(self):
         keys = []
@@ -96,21 +93,11 @@ class MyTableModel(QAbstractTableModel):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.arraydata.append(row)
         self.emit(SIGNAL("layoutChanged()"))
-#        print "arraydata: ", self.arraydata
-
-    def nxt(self):
-        n = random.randint(0, self.row_length()-1)
-        return n
 
     def rowCount(self, parent):
         return len(self.arraydata)
 
     def columnCount(self, parent):
-        if self.arraydata:
-            return len(self.arraydata[0])
-        return 0
-
-    def column_length(self):
         if self.arraydata:
             return len(self.arraydata[0])
         return 0
