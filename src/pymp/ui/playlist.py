@@ -1,4 +1,5 @@
 import time
+import random
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from .tageditor import ID3Edit
@@ -153,7 +154,15 @@ class PlaylistPanel(QWidget):
         return cpath
 
     def _random(self):
-        return 4
+        index = random.randint(0, self.model.length())
+        if not PYMPENV['FAST_CLIENT']:
+            return index
+        seq = range(0, self.model.length())
+        for _ in range(random.randint(0, 7)):
+            random.shuffle(seq)
+        val = seq[index]
+        logger.info(':random key {}'.format(val))
+        return val
 
     def _row_valid(self, row):
         if row >= self.model.length():
@@ -168,10 +177,14 @@ class PlaylistPanel(QWidget):
                 = self._index_playing.sibling(row,
                         self._index_playing.column())
         self._index_selected = self._index_playing
-        self.tbl.selectRow(row)
+        if PYMPENV['AUTO_FOCUS']:
+            self.tbl.selectRow(row)
         cpath = self._get_path(row)
         signal.emit(cpath)
         return cpath
+
+    def focus(self):
+        self.tbl.selectRow(self._index_playing.row())
 
     def prev_path(self):
         if PYMPENV['RANDOM']:

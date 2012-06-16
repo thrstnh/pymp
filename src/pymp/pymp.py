@@ -217,6 +217,9 @@ class PympGUI(QMainWindow):
     def _handle_repeat(self):
         PYMPENV.toggle('REPEAT')
 
+    def _handle_auto_focus(self):
+        PYMPENV.toggle('AUTO_FOCUS')
+
     def showEvent(self, arg1):
         ''' show user interface '''
         # NOW init player, after gui shows up
@@ -235,6 +238,7 @@ class PympGUI(QMainWindow):
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
         self.controlBar.clearPlaylist.connect(self.plsPanel.clearPlaylist)
+        self.controlBar.togFocus.connect(self._handle_auto_focus)
         self.plsPanel.playCurrent.connect(self.player.play)
         self.plsPanel.playCurrent.connect(self.trackInfo.update)
         self.plsPanel.playNext.connect(self.player.play)

@@ -41,7 +41,7 @@ class PympEnv(PropertyDict):
             'COLLECTION_CURRENT',
             'DROP_ID',
             'ICONSET_NAME', 'ICONSET_PATH',
-            'USE_SQL'])
+            'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS'])
 
     def __init__(self):
         super(PympEnv, self).__init__()
@@ -66,6 +66,8 @@ class PympEnv(PropertyDict):
         self['ICONSET_NAME'] = 'default'
         self['ICONSET_PATH'] = 'pymp/icons/iconsets/default/'
         self['USE_SQL'] = False
+        self['FAST_CLIENT'] = True
+        self['AUTO_FOCUS'] = True
 
     def change_iconset(self, name, path):
         self['ICONSET_NAME'] = name
