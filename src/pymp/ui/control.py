@@ -24,6 +24,8 @@ class ControlBar(QWidget):
     togLyric = pyqtSignal()
     togCollection = pyqtSignal()
     togMute = pyqtSignal()
+    togRandom = pyqtSignal()
+    togRepeat = pyqtSignal()
     clearPlaylist = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -49,6 +51,10 @@ class ControlBar(QWidget):
         stop = BaseButton(self.onStop.emit, iconset['playback_stop'])
         play = BaseButton(self.onPlay.emit, iconset['playback_play'])
         nxt = BaseButton(self.onNext.emit, iconset['playback_next'])
+        random = ToggleButton(PYMPENV['RANDOM'], self.togRandom.emit,
+                            iconset['random_t'], iconset['random_f'])
+        repeat = ToggleButton(PYMPENV['REPEAT'], self.togRepeat.emit,
+                            iconset['repeat_t'], iconset['repeat_f'])
         mute = ToggleButton(PYMPENV['MUTE'], self.togMute.emit,
                             iconset['playback_mute_t'], iconset['playback_mute'])
 
@@ -80,6 +86,8 @@ class ControlBar(QWidget):
         hbox.addWidget(play)
         hbox.addWidget(nxt)
         hbox.addWidget(mute)
+        hbox.addWidget(random)
+        hbox.addWidget(repeat)
         hbox.addWidget(self.sldVol)
         hbox.addWidget(self.tstart)
         hbox.addWidget(self.sldTime, 1)

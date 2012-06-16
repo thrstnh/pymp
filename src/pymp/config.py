@@ -71,18 +71,18 @@ class PympEnv(PropertyDict):
         self['ICONSET_NAME'] = name
         self['ICONSET_PATH'] = path
 
-    def _toggle(self, key):
-        logger.info(':tog {} -> {}'.format(key, self[key]))
+    def toggle(self, key):
         self[key] = not self[key]
+        logger.info(':tog {} -> {}'.format(key, self[key]))
 
     def toggle_mute(self):
-        self._toggle('MUTE')
+        self.toggle('MUTE')
 
     def toggle_lyric(self):
-        self._toggle('SHOW_LYRIC')
+        self.toggle('SHOW_LYRIC')
 
     def toggle_collection(self):
-        self._toggle('SHOW_COLLECTION')
+        self.toggle('SHOW_COLLECTION')
 
     def _save(self):
         # TODO

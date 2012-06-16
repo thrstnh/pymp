@@ -4,6 +4,9 @@ from random import randint
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ..config import TABLE_OPTIONS
+from ..logger import init_logger
+
+logger = init_logger()
 
 __all__ = ["myQTableView", "MyTableModel"]
 
@@ -62,7 +65,10 @@ class MyTableModel(QAbstractTableModel):
 #        print "tbl model:data: ", self.headerdata
 
     def empty(self):
-        return len(self.arraydata) > 0
+        return self.length() > 0
+
+    def length(self):
+        return len(self.arraydata)
 
     def clear(self):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
@@ -112,7 +118,6 @@ class MyTableModel(QAbstractTableModel):
             return QVariant()
         elif role != Qt.DisplayRole:
             return QVariant()
-#        return QVariant(self.arraydata[index.row()])
         return QVariant(self.arraydata[index.row()][index.column()])
 
     def data_row(self, row):

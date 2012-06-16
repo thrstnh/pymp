@@ -211,9 +211,11 @@ class PympGUI(QMainWindow):
     def update_labels(self):
         logger.info('update labels')
 
-    def _handle_play(self):
-        logger.info('_handle_play')
-        self.player.play(self.plsPanel.nextPath())
+    def _handle_random(self):
+        PYMPENV.toggle('RANDOM')
+
+    def _handle_repeat(self):
+        PYMPENV.toggle('REPEAT')
 
     def showEvent(self, arg1):
         ''' show user interface '''
@@ -221,12 +223,14 @@ class PympGUI(QMainWindow):
         self.player = Player(self)
         # connect some actions
         self.controlBar.togCollection.connect(self.toggleCollection)
+        self.controlBar.togRandom.connect(self._handle_random)
+        self.controlBar.togRepeat.connect(self._handle_repeat)
         self.controlBar.togLyric.connect(self.toggleLyric)
-        self.controlBar.onPrev.connect(self.player.prev)
+        self.controlBar.onPrev.connect(self.plsPanel.prev_path)
         self.controlBar.onStop.connect(self.player.stop)
         self.controlBar.onStop.connect(self.trackInfo.updateLabels)
-        self.controlBar.onPlay.connect(self._handle_play)
-        self.controlBar.onNext.connect(self.plsPanel.nextPath)
+        self.controlBar.onPlay.connect(self.plsPanel.current_path)
+        self.controlBar.onNext.connect(self.plsPanel.next_path)
         self.controlBar.togMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)
@@ -235,6 +239,8 @@ class PympGUI(QMainWindow):
         self.plsPanel.playCurrent.connect(self.trackInfo.update)
         self.plsPanel.playNext.connect(self.player.play)
         self.plsPanel.playNext.connect(self.trackInfo.update)
+        self.plsPanel.playPrev.connect(self.player.play)
+        self.plsPanel.playPrev.connect(self.trackInfo.update)
         self.player.timeStart.connect(self.controlBar.setTimeStart)
         self.player.timeTotal.connect(self.controlBar.setTimeTotal)
         self.player.sldMove.connect(self.controlBar.set_time)
@@ -246,7 +252,7 @@ class PympGUI(QMainWindow):
         self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
         self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
         # IF REPEAT...
-        self.player.finishedSong.connect(self.plsPanel.nextPath)
+        self.player.finishedSong.connect(self.plsPanel.next_path)
         #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
         self.plsPanel.enqueue.connect(self.queuedlg.append)
         self.controlBar.set_volume(75)  # TODO read from config

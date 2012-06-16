@@ -5,8 +5,10 @@ from .tageditor import ID3Edit
 from ..logger import init_logger
 from ..model.table import MyTableModel, myQTableView
 from ..style import iconset
+from ..config import init_env
 
 logger = init_logger()
+PYMPENV = init_env()
 
 
 class PlaylistPanel(QWidget):
@@ -19,6 +21,7 @@ class PlaylistPanel(QWidget):
     '''
     # send signal on double click
     playCurrent = pyqtSignal(QString)
+    playPrev = pyqtSignal(QString)
     playNext = pyqtSignal(QString)
     enqueue = pyqtSignal(list)
     dequeue = pyqtSignal(list)
@@ -62,7 +65,7 @@ class PlaylistPanel(QWidget):
 
         #vbox = QVBoxLayout(self)
 
-#        self.tbl.clicked.connect(self.clicked)
+        self.tbl.clicked.connect(self.clicked)
         self.tbl.doubleClicked.connect(self.double_clicked)
 #        self.tbl.activated.connect(self.activated)
 #        self.tbl.entered.connect(self.entered)
@@ -144,26 +147,61 @@ class PlaylistPanel(QWidget):
             return any(br)
         return all(br)
 
-    def getPath(self, idx):
-        ''' get current path from QModelIndex '''
-        data = self.model.data_row(idx.row())
-        cpath = QString(data[len(data)-1])
-        return cpath
-
-    def nextPath(self):
-        row = self.model.nxt()
-        self.tbl.selectRow(row)
+    def _get_path(self, row):
         data = self.model.data_row(row)
         cpath = QString(data[len(data)-1])
-        self.playNext.emit(cpath)
         return cpath
 
-#    def clicked(self, idx):
-#        raise NotImplementedError
+    def _random(self):
+        return 4
+
+    def _row_valid(self, row):
+        if row >= self.model.length():
+            return 0
+        if row < 0:
+            return self.model.length() - 1
+        return row
+
+    def _change_index(self, row, signal):
+        row = self._row_valid(row)
+        self._index_playing \
+                = self._index_playing.sibling(row,
+                        self._index_playing.column())
+        self._index_selected = self._index_playing
+        self.tbl.selectRow(row)
+        cpath = self._get_path(row)
+        signal.emit(cpath)
+        return cpath
+
+    def prev_path(self):
+        if PYMPENV['RANDOM']:
+            row = self._random()
+        else:
+            row = self._index_playing.row() - 1
+        return self._change_index(row, self.playPrev)
+
+    def next_path(self):
+        if PYMPENV['RANDOM']:
+            row = self._random()
+        else:
+            row = self._index_playing.row() + 1
+        return self._change_index(row, self.playNext)
+
+    def current_path(self):
+        cpath = self._get_path(self._index_selected.row())
+        self._index_playing = self._index_selected
+        self.playCurrent.emit(cpath)
+        return cpath
+
+    def clicked(self, idx):
+        logger.info('playlist clicked {}, {}'.format(idx.row(), idx.column()))
+        self._index_selected = idx
+        self.tbl.selectRow(idx.row())
 
     def double_clicked(self, idx):
         ''' double click on playlist emits playCurrent signal '''
-        cpath = self.getPath(idx)
+        self._index_playing = idx
+        cpath = self._get_path(idx.row())
         self.playCurrent.emit(cpath)
         return cpath
 

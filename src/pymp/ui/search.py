@@ -1,5 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from .widgets import BaseButton
 from ..style import iconset
 
 
@@ -20,15 +21,8 @@ class SearchBar(QWidget):
         ''' TODO: init user interface '''
         #pref = '../data/'
         #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
-        clr = QPushButton(QIcon(iconset['cancel']), "", self)
-        clr.setFocusPolicy(Qt.NoFocus)
-        clr.clicked.connect(self.clrSearch)
-        clr.setMinimumSize(QSize(16,16))
-        clr.setMaximumSize(QSize(16,16))
-        #clr.setStyleSheet(cssButton)
-
+        clr = BaseButton(self.clrSearch, iconset['delete'])
         self._search_timer.timeout.connect(self.searchTimeout)
-
         self.line = QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
         self.line.returnPressed.connect(self.txReturn)
