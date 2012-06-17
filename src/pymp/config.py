@@ -45,7 +45,7 @@ class PympEnv(PropertyDict):
             'SEARCH_TIMEOUT'])
 
     def __init__(self):
-        super(PympEnv, self'.__init__()
+        super(PympEnv, self).__init__()
         self._init_defaults()
 
     def _init_defaults(self):
