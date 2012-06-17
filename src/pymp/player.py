@@ -3,7 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.phonon import Phonon
 from .logger import init_logger
 from .utils import handle_time
-from .mp3 import PMP3
+from .mp3 import PMP3, DMP3
 from .config import init_env
 
 logger = init_logger()
@@ -28,13 +28,8 @@ class Player(QObject):
         self.m_audio = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.player, self.m_audio)
         #self.player.setTickInterval(100)
-        # actions
         #self.player.tick.connect(self._update_labels)
         self.player.finished.connect(self.finished)
-
-        #print Phonon.BackendCapabilities.availableAudioEffects()
-        # QSlider -> SeekSlider
-        #self.slider_time = Phonon.SeekSlider(self.player, self)
 
 #    def tick(self):
 #        self._update_labels()
@@ -42,6 +37,7 @@ class Player(QObject):
     def play(self, cpath):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
         PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
+        PYMPENV['CURRENT_DMP3'] = DMP3(cpath)
         self.player.play()
         logger.info('now playing:\n{}'.format(
                     '\n'.join(['  {} -> {}'.format(k,v)
@@ -52,31 +48,17 @@ class Player(QObject):
         PYMPENV['CURRENT_TRACK'] = None
         self._update_labels()
 
-#    def nxt(self, cpath):
- #       logger.info("Player::next")
-
-#    def prev(self):
-#        logger.info("Player::prev")
-
     def mute(self):
         self.m_audio.setMuted(not self.m_audio.isMuted())
         logger.info("muted: {}".format(self.m_audio.isMuted()))
 
-#    def random(self):
-#        logger.info("Player::random")
-
-#    def repeat(self):
-#        logger.info("Player::repeat")
-
     def volume(self, val):
-        ''' TODO: slider changed value'''
         self.volScratched.emit(val)
         val = float(val) / 100.
         #print dir(self.m_audio)
         self.m_audio.setVolume(val)
 
     def time(self, val):
-        ''' TODO: slider changed value'''
         if self.player and self.player.state() == Phonon.PlayingState:
             seek = (val * self.player.totalTime()) / 100
             self.player.seek(seek)

@@ -130,16 +130,12 @@ class DMP3(PropertyDict):
         self['PATH'] = path
         try:
             self.mp3 = MP3(self['PATH'])
-            logger.info('is mp3  {}'.format(self['PATH']))
         except:
             self.mp3 = None
-            logger.debug('no mp3  {}'.format(self['PATH']))
         try:
             self.id3 = ID3(self['PATH'])
-            logger.info('has id3  {}'.format(self['PATH']))
         except:
             self.id3 = None
-            logger.debug('no id3  {}'.format(self['PATH']))
         self._init()
 
     def _init(self):

@@ -45,7 +45,7 @@ class PympEnv(PropertyDict):
             'SHOW_LYRIC', 'SHOW_COLLECTION',
             'LFM_LOGIN', 'LFM_SCROBBLE', 'LFM_NOW_PLAYING',
             'COLLECTION_CURRENT',
-            'CURRENT_TRACK',
+            'CURRENT_TRACK', 'CURRENT_DMP3',
             'DROP_ID',
             'ICONSET_NAME', 'ICONSET_PATH',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
@@ -77,6 +77,7 @@ class PympEnv(PropertyDict):
         self['LFM_NOW_PLAYING'] = False
         self['COLLECTION_CURRENT'] = ''
         self['CURRENT_TRACK'] = None
+        self['CURRENT_DMP3'] = None
         self['DROP_ID'] = 6666666
         self['ICONSET_NAME'] = 'default'
         self['ICONSET_PATH'] = 'pymp/icons/iconsets/default/'
@@ -96,6 +97,7 @@ class PympEnv(PropertyDict):
 
     def toggle(self, key):
         self[key] = not self[key]
+        self.save()
         logger.info(':tog {} -> {}'.format(key, self[key]))
 
     def toggle_mute(self):

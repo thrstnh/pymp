@@ -1,7 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from .widgets import BaseButton
-from ..style import iconset
 
 
 class SearchBar(QWidget):
@@ -20,10 +19,9 @@ class SearchBar(QWidget):
         self.initUI()
 
     def initUI(self):
-        ''' TODO: init user interface '''
-        #pref = '../data/'
-        #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
+        #cssButton = "border: solid 1px black;"
         clr = BaseButton(self.clrSearch, self._image)
+        #clr.setStyleSheet(cssButton)
         self._search_timer.timeout.connect(self.searchTimeout)
         self.line = QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
@@ -48,11 +46,8 @@ class SearchBar(QWidget):
 
     def txReturn(self):
         self.search.emit(self.pattern)
-        #self.pattern = self.line.text()
-        #self.search.emit(self.pattern)
 
     def clrSearch(self):
-        ''' clear search '''
         self.pattern = ''
         self.line.setText(self.pattern)
         self.clearSearch.emit(self.pattern)
