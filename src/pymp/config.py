@@ -2,15 +2,16 @@ import sys
 import os
 import os.path
 import time
+import json
 from os.path import expanduser
 from os.path import join
-from pprint import pprint as pp
 from .logger import init_logger
 
 ENCODING = sys.stdout.encoding or sys.getfilesystemencoding()
 PYMPENV = None
 TABLE_PROP = None
 ROOT_DIR = expanduser('~/.pymp')
+FILE_CONFIG = join(ROOT_DIR, 'config')
 TIME_PATTERN = '%Y-%m-%d--%H:%M:%S'
 
 def now():
@@ -37,7 +38,7 @@ class PropertyDict(dict):
 
 class PympEnv(PropertyDict):
     _VALID_KEYS = set([
-            'DEBUG',
+            'DEBUG', 'APP', 'VERSION',
             'FILE_DB',
             'DIR_ROOT', 'DIR_LOG', 'DIR_LYRICS',
             'RANDOM', 'REPEAT', 'MUTE',
@@ -53,10 +54,15 @@ class PympEnv(PropertyDict):
 
     def __init__(self):
         super(PympEnv, self).__init__()
-        self._init_defaults()
+        try:
+            self.load()
+        except:
+            self._init_defaults()
 
     def _init_defaults(self):
         self['DEBUG'] = False
+        self['APP'] = 'pymp'
+        self['VERSION'] = '0.1'
         self['FILE_DB'] = join(ROOT_DIR, 'pymp.db')
         self['DIR_ROOT'] = ROOT_DIR
         self['DIR_LOG'] = join(ROOT_DIR, 'log')
@@ -101,13 +107,20 @@ class PympEnv(PropertyDict):
     def toggle_collection(self):
         self.toggle('SHOW_COLLECTION')
 
-    def _save(self):
-        # TODO
-        pass
+    def save(self):
+        with open(FILE_CONFIG, 'w') as fp:
+            fp.write(str(self))
 
-    def _load(self):
-        # TODO
-        pass
+    def load(self):
+        conf = self._load_config()
+        self.update(conf)
+
+    def _load_config(self):
+        with open(FILE_CONFIG) as fp:
+            return json.loads(fp.read())
+
+    def __str__(self):
+        return json.dumps(self, sort_keys=True, indent=4)
 
 
 def init_env():
