@@ -141,8 +141,10 @@ class PympGUI(QMainWindow):
 
         # controls
         self.controlBar = ControlBar(self)
-        self.searchBarCollection = SearchBar(self)
-        self.searchBarPlaylist = SearchBar(self)
+        self.searchBarCollection = SearchBar(self, iconset['delete'],
+                                             PYMPENV['SEARCH_TIMEOUT'])
+        self.searchBarPlaylist = SearchBar(self, iconset['delete'],
+                                           PYMPENV['SEARCH_TIMEOUT'])
         self.plsPanel = PlaylistPanel(self)
         self.colPanel = CollectionPanel(self, self.plsPanel)
         self.trackInfo = TrackInfoBar(self)

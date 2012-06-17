@@ -58,19 +58,25 @@ class PlaylistPanel(QWidget):
         vh = self.tbl.verticalHeader()
         vh.setVisible(False)
         vh.setDefaultSectionSize(14)
-        hh = self.tbl.horizontalHeader()
-        hh.setStretchLastSection(True)
-
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.tbl, 1)
-
         #vbox = QVBoxLayout(self)
-
         self.tbl.clicked.connect(self.clicked)
         self.tbl.doubleClicked.connect(self.double_clicked)
+        self._init_hdr()
+        # TODO qt_layout decorator
 #        self.tbl.activated.connect(self.activated)
 #        self.tbl.entered.connect(self.entered)
 #        self.tbl.pressed.connect(self.pressed)
+
+    def _init_hdr(self):
+        self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
+        hh = self.tbl.horizontalHeader()
+        hh.setStretchLastSection(True)
+        hh.resizeSection(0, 60)
+        hh.resizeSection(1, 180)
+        hh.resizeSection(2, 180)
+        self.tbl.emit(SIGNAL("layoutChanged()"))
 
     def popup(self, point):
         idx = self.tbl.selectionModel().currentIndex()
@@ -99,14 +105,16 @@ class PlaylistPanel(QWidget):
     def clearPlaylist(self):
         self.model.clear()
 
-    def search(self, pattern):
+    def search(self, pattern=''):
         tstart = time.time()
+        self._init_hdr()
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
             pattern = str(pattern).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear()
+            self._init_hdr()
             self.tbl.emit(SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
                 if self.__valid_entry(v, map(str.strip, pattern), (1, 2, 3)):
@@ -114,9 +122,6 @@ class PlaylistPanel(QWidget):
                     self.appendModel(v)
                     self.tbl.emit(SIGNAL("layoutChanged()"))
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.row_length()))
-        self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self.tbl.resizeRowsToContents()
-        self.tbl.emit(SIGNAL("layoutChanged()"))
         logger.info(':fill {}s'.format(time.time() - tstart))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):

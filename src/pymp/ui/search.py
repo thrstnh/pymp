@@ -12,16 +12,18 @@ class SearchBar(QWidget):
     clearSearch = pyqtSignal(QString)
     timerExpired = pyqtSignal(QString)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, image, timeout=300):
         QWidget.__init__(self, parent)
         self._search_timer = QTimer(self)
+        self._timeout = timeout
+        self._image = image
         self.initUI()
 
     def initUI(self):
         ''' TODO: init user interface '''
         #pref = '../data/'
         #cssButton = "border-style: flat; border-width: 0px; border-color: black;"
-        clr = BaseButton(self.clrSearch, iconset['delete'])
+        clr = BaseButton(self.clrSearch, self._image)
         self._search_timer.timeout.connect(self.searchTimeout)
         self.line = QLineEdit('', self)
         self.line.textChanged.connect(self.txChanged)
@@ -42,7 +44,7 @@ class SearchBar(QWidget):
         '''
         if self._search_timer.isActive():
             self._search_timer.stop()
-        self._search_timer.start(1000)
+        self._search_timer.start(self._timeout)
 
     def txReturn(self):
         self.search.emit(self.pattern)

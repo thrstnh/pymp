@@ -4,8 +4,10 @@ from .search import SearchBar
 from ..logger import init_logger
 from ..model.table import MyTableModel, myQTableView
 from ..style import iconset
+from ..config import init_env
 
 logger = init_logger()
+PYMPENV = init_env()
 
 
 class QueueDialog(QDialog):
@@ -17,7 +19,8 @@ class QueueDialog(QDialog):
 
     def initUI(self):
         vbox = QVBoxLayout(self)
-        self.searchBar = SearchBar(self)
+        self.searchBar = SearchBar(self, iconset['delete'],
+                                   PYMPENV['SEARCH_TIMEOUT'])
         self.tbl = myQTableView(self) #QTableView(self)
         self.model = MyTableModel()
         self.tbl.setModel(self.model)
