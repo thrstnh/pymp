@@ -1,6 +1,11 @@
+import copy
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 from mutagen.mp3 import *
+from .config import PropertyDict
+from .logger import init_logger
+
+logger = init_logger()
 
 id3_frames = {
             #http://en.wikipedia.org/wiki/ID3
@@ -109,14 +114,74 @@ id3_frames = {
             'TSOT': 'Title sort order',
             'TSST': 'Set subtitle'}
 
+ID3_FRAMES = id3_frames  # TODO rename
+
 fields = ['TPE2', 'TPE1', 'TIT1', 'TIT2', 'TALB', 'TLEN', 'TDRC', 'TRCK',
         'TENC', 'TFLT', 'TDRL', 'TLAN', 'TPUB', 'TCOP',  'TCON', 'TCOM',
         'TSSE', 'TDTG', 'TBPM', 'TPOS', 'BITR']
 
-#fields = ['TDRC', 'TRCK', 'TCON', 'TIT2', 'TPE1',
-#                'TPE2', 'TALB', 'TLEN', 'TPOS', 'TSSE']
+
+class DMP3(PropertyDict):
+
+    _VALID_KEYS = set(ID3_FRAMES.keys()+['PATH'])
+
+    def __init__(self, path, *args, **kw):
+        super(DMP3, self).__init__(*args, **kw)
+        self['PATH'] = path
+        try:
+            self.mp3 = MP3(self['PATH'])
+            logger.info('is mp3  {}'.format(self['PATH']))
+        except:
+            self.mp3 = None
+            logger.debug('no mp3  {}'.format(self['PATH']))
+        try:
+            self.id3 = ID3(self['PATH'])
+            logger.info('has id3  {}'.format(self['PATH']))
+        except:
+            self.id3 = None
+            logger.debug('no id3  {}'.format(self['PATH']))
+        self._init()
+
+    def _init(self):
+        if self.is_mp3 and self.has_id3:
+            for k in self._VALID_KEYS:
+                item = self.id3.get(k, '')
+                if item:
+                    self[k] = '{}'.format(item)
+            self['TLEN'] = self.length
+            self['BITR'] = self.bitrate or ''
+
+    @property
+    def frames(self):
+        return set(self.keys())
+
+    @property
+    def is_mp3(self):
+        if self.mp3:
+            return True
+        return False
+
+    @property
+    def has_id3(self):
+        if self.is_mp3 and self.id3:
+            return True
+        return False
+
+    @property
+    def length(self):
+        if self.is_mp3:
+            return self.mp3.info.length
+        return -1
+
+    @property
+    def bitrate(self):
+        if self.is_mp3:
+            return self.mp3.info.bitrate
+        return -1
+
 
 class PMP3(object):
+
     def __init__(self, path=''):
         self._path = path
 
@@ -201,16 +266,16 @@ class PMP3(object):
             return d
         return {}
 
-    def id3_frames(self):
-        ret = dict()
-        if self.is_mp3 and self.has_id3:
-
-            for fkey in id3_frames:
-                item = self.id3.get(fkey, '')
-                if item:
-                    ret[fkey] = (item, id3_frames[fkey])
-            ret.update({'TLEN' : (str(self.length()), id3_frames[fkey])})
-        return ret
+#    def id3_frames(self):
+#        ret = dict()
+#        if self.is_mp3 and self.has_id3:
+#
+#            for fkey in id3_frames:
+#                item = self.id3.get(fkey, '')
+#                if item:
+#                    ret[fkey] = (item, id3_frames[fkey])
+#            ret.update({'TLEN' : (str(self.length()), id3_frames[fkey])})
+#        return ret
 
     def __str__(self):
-        return '%r \n%r' % (self.path, self.id3_frames())
+        return '%r \n%r' % (self.path, self.all())

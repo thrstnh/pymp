@@ -1,6 +1,9 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from ..lyric import LyricWorker
+from ..logger import init_logger
+
+logger = init_logger()
 
 
 class LyricPanel(QWidget):
@@ -27,6 +30,13 @@ class LyricPanel(QWidget):
     def search(self, artist, track):
         ''' search a lyrics with a thread '''
         # clear
+        if self.artist == artist \
+                and self.track == track:
+                    logger.debug('lyrics request equals previous one! '\
+                                 '{} - {}'.format(artist, track))
+                    return
+        else:
+            logger.info('fetching lyrics: {} - {}'.format(self.artist, self.track))
         self.lblTrackInfo.setText('')
         self.txt.setText('')
         # set

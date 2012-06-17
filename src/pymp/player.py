@@ -3,8 +3,11 @@ from PyQt4.QtCore import *
 from PyQt4.phonon import Phonon
 from .logger import init_logger
 from .utils import handle_time
+from .mp3 import PMP3
+from .config import init_env
 
 logger = init_logger()
+PYMPENV = init_env()
 
 
 class Player(QObject):
@@ -38,27 +41,29 @@ class Player(QObject):
 
     def play(self, cpath):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
+        PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
         self.player.play()
 
     def stop(self):
         self.player.stop()
+        PYMPENV['CURRENT_TRACK'] = None
         self._update_labels()
 
-    def nxt(self, cpath):
-        logger.info("Player::next")
+#    def nxt(self, cpath):
+ #       logger.info("Player::next")
 
-    def prev(self):
-        logger.info("Player::prev")
+#    def prev(self):
+#        logger.info("Player::prev")
 
     def mute(self):
         self.m_audio.setMuted(not self.m_audio.isMuted())
         logger.info("muted: {}".format(self.m_audio.isMuted()))
 
-    def random(self):
-        logger.info("Player::random")
+#    def random(self):
+#        logger.info("Player::random")
 
-    def repeat(self):
-        logger.info("Player::repeat")
+#    def repeat(self):
+#        logger.info("Player::repeat")
 
     def volume(self, val):
         ''' TODO: slider changed value'''

@@ -43,15 +43,15 @@ class TrackInfoBar(QWidget):
             self._init()
             self.updateInformation()
             return
-        mpfile = PMP3(qstr)
-        self.track['artist'] = mpfile.artist
-        self.track['title'] = mpfile.title
-        self.track['album'] = mpfile.album
-        self.track['year'] = mpfile.year
-        self.track['tracknr'] = mpfile.trackno
-        self.track['genre'] = mpfile.genre
+        ct = PYMPENV['CURRENT_TRACK']
+        self.track['artist'] = ct.artist
+        self.track['title'] = ct.title
+        self.track['album'] = ct.album
+        self.track['year'] = ct.year
+        self.track['tracknr'] = ct.trackno
+        self.track['genre'] = ct.genre
         self.updateInformation()
-        if PYMPENV['SHOW_LYRICS'] \
+        if PYMPENV['SHOW_LYRIC'] \
                 and self.track['artist'] \
                 and self.track['title']:
             self.fetchLyrics.emit(self.track.get('artist', QString('')),

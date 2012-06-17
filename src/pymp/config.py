@@ -39,6 +39,7 @@ class PympEnv(PropertyDict):
             'SHOW_LYRIC', 'SHOW_COLLECTION',
             'LFM_LOGIN', 'LFM_SCROBBLE', 'LFM_NOW_PLAYING',
             'COLLECTION_CURRENT',
+            'CURRENT_TRACK',
             'DROP_ID',
             'ICONSET_NAME', 'ICONSET_PATH',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
@@ -57,12 +58,13 @@ class PympEnv(PropertyDict):
         self['RANDOM'] = True
         self['REPEAT'] = False
         self['MUTE'] = False
-        self['SHOW_LYRIC'] = False
+        self['SHOW_LYRIC'] = True
         self['SHOW_COLLECTION'] = True
         self['LFM_LOGIN'] = False
         self['LFM_SCROBBLE'] = False
         self['LFM_NOW_PLAYING'] = False
         self['COLLECTION_CURRENT'] = ''
+        self['CURRENT_TRACK'] = None
         self['DROP_ID'] = 6666666
         self['ICONSET_NAME'] = 'default'
         self['ICONSET_PATH'] = 'pymp/icons/iconsets/default/'

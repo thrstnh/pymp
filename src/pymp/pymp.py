@@ -190,6 +190,11 @@ class PympGUI(QMainWindow):
 
     def toggleLyric(self):
         self.right.setVisible(not self.right.isVisible())
+        if PYMPENV['CURRENT_TRACK']:
+            self.lyricPanel.search(
+                        str(PYMPENV['CURRENT_TRACK'].artist),
+                        str(PYMPENV['CURRENT_TRACK'].title))
+
 
     def defAction(self):
         raise NotImplementedError
