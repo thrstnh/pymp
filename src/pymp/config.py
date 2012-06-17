@@ -48,7 +48,8 @@ class PympEnv(PropertyDict):
             'DROP_ID',
             'ICONSET_NAME', 'ICONSET_PATH',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
-            'SEARCH_TIMEOUT'])
+            'SEARCH_TIMEOUT',
+            'TAG_UPDATE'])
 
     def __init__(self):
         super(PympEnv, self).__init__()
@@ -77,6 +78,11 @@ class PympEnv(PropertyDict):
         self['FAST_CLIENT'] = True
         self['AUTO_FOCUS'] = True
         self['SEARCH_TIMEOUT'] = 300
+        # this is an option for collection rescan,
+        # if it is True, the rescan of a collection
+        # also checks for new or updated id3-tags,
+        # otherwise only for new file in the collection.
+        self['TAG_UPDATE'] = False
 
     def change_iconset(self, name, path):
         self['ICONSET_NAME'] = name
