@@ -5,7 +5,6 @@ from PyQt4.QtCore import *
 from .tageditor import ID3Edit
 from ..logger import init_logger
 from ..model.table import MyTableModel, myQTableView
-from ..style import iconset
 from ..config import init_env
 
 logger = init_logger()
@@ -70,7 +69,6 @@ class PlaylistPanel(QWidget):
 #        self.tbl.pressed.connect(self.pressed)
 
     def init_hdr(self):
-        print('init_hdr')
         self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.tbl.horizontalHeader().setStretchLastSection(True)
         self.tbl.horizontalHeader().resizeSection(0, 60)
@@ -110,7 +108,7 @@ class PlaylistPanel(QWidget):
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
-            pattern = str(pattern).lower().split()
+            pattern = str(pattern.toUtf8()).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear()
             self.tbl.emit(SIGNAL("layoutChanged()"))

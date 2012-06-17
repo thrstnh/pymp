@@ -61,8 +61,6 @@ class MyTableModel(QAbstractTableModel):
 
         self.arraydata = []#[[QString(u'32508'), 'P.O.S.', '(hed) p.e.', '(hed) p.e.', 'Crossover', '1997', '03:13', '01/13', '//media/music/MP3-jollyroger/Alben/hed p.e./(hed) p.e.-1997-(hed) p.e/01 P.O.S..mp3'],]
         self.headerkeys, self.headerdata = self._init_tbl_columns()
-#        print "tbl model:keys: ", self.headerkeys
-#        print "tbl model:data: ", self.headerdata
 
     def empty(self):
         return self.length() > 0

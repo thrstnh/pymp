@@ -43,6 +43,9 @@ class Player(QObject):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
         PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
         self.player.play()
+        logger.info('now playing:\n{}'.format(
+                    '\n'.join(['  {} -> {}'.format(k,v)
+                        for k,v in PYMPENV['CURRENT_TRACK'].all().items()])))
 
     def stop(self):
         self.player.stop()

@@ -27,7 +27,9 @@ class LyricWorker(QThread):
             lyr = self._read()
             if not lyr:
                 try:
-                    lyr = lyricwiki.get_lyrics(self.artist, self.title)
+                    # TODO comment of if lyricwiki is fixed
+                    lyr = None
+                    #lyr = lyricwiki.get_lyrics(self.artist, self.title)
                 except Exception, e:
                     logger.warning('lyrics not found or error: {}'.format(e))
                 if lyr:
@@ -39,7 +41,6 @@ class LyricWorker(QThread):
             self.lyricFetched.emit(lyr)
             return
         else:
-            logger.debug("QThread filed?...")
             self.lyricFetched.emit('no lyrics found...')
         return
 
@@ -53,7 +54,7 @@ class LyricWorker(QThread):
                 lyr = f.read()
             return lyr
         except Exception, e:
-            logger.info("Lyrics Datei nicht gefunden: {}".format(fp))
+            pass
         return ''
 
     def _save(self, lyr):

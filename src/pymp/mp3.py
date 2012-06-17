@@ -266,16 +266,16 @@ class PMP3(object):
             return d
         return {}
 
-#    def id3_frames(self):
-#        ret = dict()
-#        if self.is_mp3 and self.has_id3:
-#
-#            for fkey in id3_frames:
-#                item = self.id3.get(fkey, '')
-#                if item:
-#                    ret[fkey] = (item, id3_frames[fkey])
-#            ret.update({'TLEN' : (str(self.length()), id3_frames[fkey])})
-#        return ret
+    def frames(self):
+        ret = dict()
+        if self.is_mp3 and self.has_id3:
+
+            for fkey in id3_frames:
+                item = self.id3.get(fkey, '')
+                if item:
+                    ret[fkey] = (item, id3_frames[fkey])
+            ret.update({'TLEN' : (str(self.length()), id3_frames[fkey])})
+        return ret
 
     def __str__(self):
-        return '%r \n%r' % (self.path, self.all())
+        return '%r \n%r' % (self.path, self.frames())

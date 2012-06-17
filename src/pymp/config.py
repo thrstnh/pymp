@@ -1,20 +1,25 @@
+import sys
 import os
 import os.path
 import time
 from os.path import expanduser
 from os.path import join
+from pprint import pprint as pp
 from .logger import init_logger
 
+ENCODING = sys.stdout.encoding or sys.getfilesystemencoding()
 PYMPENV = None
 TABLE_PROP = None
 ROOT_DIR = expanduser('~/.pymp')
 TIME_PATTERN = '%Y-%m-%d--%H:%M:%S'
 
-logger = init_logger()
-
-
 def now():
     return time.strftime(TIME_PATTERN)
+
+logger = init_logger()
+logger.debug(':start {}'.format(now()))
+logger.debug(':HOME {}'.format(ROOT_DIR))
+logger.debug(':encoding {}'.format(ENCODING))
 
 
 class PropertyDict(dict):
@@ -107,7 +112,9 @@ def init_env():
     return PYMPENV
 
 PYMPENV = init_env()
-
+logger.debug(':env\n{}'.format('\n'.join(
+                [' {} -> {}'.format(k, v)
+                    for k,v in PYMPENV.items()])))
 
 if not os.path.exists(ROOT_DIR):
     logger.info('create ~/.pymp files')
