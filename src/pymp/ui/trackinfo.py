@@ -1,6 +1,9 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from ..mp3 import PMP3
+from ..config import init_env
+
+PYMPENV = init_env()
 
 
 class TrackInfoBar(QWidget):
@@ -48,7 +51,9 @@ class TrackInfoBar(QWidget):
         self.track['tracknr'] = mpfile.trackno
         self.track['genre'] = mpfile.genre
         self.updateInformation()
-        if self.track['artist'] and self.track['title']:
+        if PYMPENV['SHOW_LYRICS'] \
+                and self.track['artist'] \
+                and self.track['title']:
             self.fetchLyrics.emit(self.track.get('artist', QString('')),
                                   self.track.get('title', QString('')))
 

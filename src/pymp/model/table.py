@@ -102,9 +102,6 @@ class MyTableModel(QAbstractTableModel):
             return len(self.arraydata[0])
         return 0
 
-    def row_length(self):
-        return len(self.arraydata)
-
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
