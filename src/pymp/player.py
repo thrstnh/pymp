@@ -37,7 +37,7 @@ class Player(QObject):
     def play(self, cpath):
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
         PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
-        PYMPENV['CURRENT_DMP3'] = DMP3(cpath)
+        #PYMPENV['CURRENT_DMP3'] = DMP3(cpath)
         self.player.play()
         logger.info('now playing:\n{}'.format(
                     '\n'.join(['  {} -> {}'.format(k,v)
