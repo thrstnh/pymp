@@ -224,9 +224,11 @@ class PympGUI(QMainWindow):
     def _handle_repeat(self):
         PYMPENV.toggle('REPEAT')
         if PYMPENV['REPEAT']:
+            self.player.finishedSong.disconnect(self._player_stopped)
             self.player.finishedSong.connect(self.plsPanel.next_path)
         else:
             self.player.finishedSong.disconnect(self.plsPanel.next_path)
+            self.player.finishedSong.connect(self._player_stopped)
 
     def _handle_auto_focus(self):
         PYMPENV.toggle('AUTO_FOCUS')
@@ -241,7 +243,8 @@ class PympGUI(QMainWindow):
         # connect some actions
         if PYMPENV['REPEAT']:
             self.player.finishedSong.connect(self.plsPanel.next_path)
-        self.player.finishedSong.connect(self._player_stopped)
+        else:
+            self.player.finishedSong.connect(self._player_stopped)
         self.controlBar.togCollection.connect(self.toggleCollection)
         self.controlBar.togRandom.connect(self._handle_random)
         self.controlBar.togRepeat.connect(self._handle_repeat)
@@ -272,7 +275,6 @@ class PympGUI(QMainWindow):
         self.player.sldMove.connect(self.controlBar.set_time)
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.player.volScratched.connect(self.controlBar.volChangeValue)
-        self.player.finishedSong.connect(self._player_stopped)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
         self.searchBarPlaylist.clearSearch.connect(self.plsPanel.search)
         self.searchBarPlaylist.timerExpired.connect(self.plsPanel.search)
