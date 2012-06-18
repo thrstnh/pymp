@@ -1,4 +1,3 @@
-import copy
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 from mutagen.mp3 import *

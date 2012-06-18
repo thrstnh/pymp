@@ -26,6 +26,7 @@ class PympGUI(QMainWindow):
         self._compute_actions()
         self._init_menubar()
         self.setCentralWidget(self._init_ctrls())
+        self._reconnect_actions()
         self.update_statusbar('Ready.')
         self.show()
 
@@ -102,37 +103,35 @@ class PympGUI(QMainWindow):
 
     def _init_actions(self):
         self.actions = {}
-        # actions in a dict :)
         self.actionsDict = {
                 'addCollection':  ['Add &Collection', 'Ctrl+Q', 'Add Collection',
-                                    qApp.quit, iconset['new']],
+                                    self.defAction, iconset['new']],
                 'newPlaylist':    ['New &Playlist', 'Ctrl+P', 'New Playlist',
-                                    qApp.quit, iconset['new']],
+                                    self.defAction, iconset['new']],
                 'openPlaylist':   ['Open Playlist', 'Ctrl+P', 'Open Playlist',
-                                    qApp.quit, iconset['open']],
+                                    self.defAction, iconset['open']],
                 'savePlaylist':   ['Save Playlist', 'Ctrl+P', 'Save Playlist',
-                                    qApp.quit, iconset['save']],
+                                    self.defAction, iconset['save']],
                 'viewCollection': ['View Collection', 'Ctrl+I', 'View Collection Panel',
-                                    qApp.quit, iconset['cancel']],
+                                    self.toggleCollection, iconset['layout_lp']],
                 'viewLyric':      ['View Lyric', 'Ctrl+L', 'View Lyric Panel',
-                                    qApp.quit, iconset['cancel']],
-                # ctrl actions
+                                    self.toggleLyric, iconset['layout_rp']],
                 'playback_ff':    ['FF', 'Ctrl+Q', 'Forward',
-                                    qApp.quit, iconset['playback_ff']],
+                                    self.defAction, iconset['playback_ff']],
                 'playback_next':  ['Next', 'Ctrl+Q', 'Next Track',
-                                    qApp.quit, iconset['playback_next']],
+                                    self.defAction, iconset['playback_next']],
                 'playback_pause': ['Pause', 'Ctrl+Q', 'Pause',
-                                    qApp.quit, iconset['playback_pause']],
+                                    self.defAction, iconset['playback_pause']],
                 'playback_play':  ['Play', 'Ctrl+Q', 'Play',
-                                    qApp.quit, iconset['playback_play']],
+                                    self.defAction, iconset['playback_play']],
                 'playback_prev':  ['Prev', 'Ctrl+Q', 'Prev',
-                                    qApp.quit, iconset['playback_prev']],
+                                    self.defAction, iconset['playback_prev']],
                 'playback_rew':   ['Rew', 'Ctrl+Q', 'Rew',
-                                    qApp.quit, iconset['playback_rew']],
+                                    self.defAction, iconset['playback_rew']],
                 'playback_stop':  ['Stop', 'Ctrl+Q', 'Stop',
-                                    qApp.quit, iconset['playback_stop']],
+                                    self.defAction, iconset['playback_stop']],
                 'playback_mute':  ['Mute', 'Ctrl+Q', 'Mute',
-                                    qApp.quit, iconset['playback_mute']],
+                                    self.defAction, iconset['playback_mute']],
                 'lookandfeel':    ['look and feel', 'Ctrl+F', 'Change look and feel',
                                     self.lookandfeel, iconset['lookandfeel']],
                 'shuffle':        ['shuffle', 'Ctrl+F', 'shuffle true/false',
@@ -142,9 +141,9 @@ class PympGUI(QMainWindow):
                 'clear':          ['clear Playlist', 'Ctrl+F', 'clear playlist',
                                     self.defAction, iconset['clear']],
                 'help':           ['help', 'Ctrl+F', 'help',
-                                    qApp.quit, iconset['cancel']],
+                                    self.defAction, iconset['cancel']],
                 'about':          ['About pymp', 'Ctrl+F', 'about',
-                                    qApp.quit, iconset['cancel']],
+                                    self.defAction, iconset['cancel']],
                 'exit':           ['Exit', 'Ctrl+Q', 'Exit Application',
                                     qApp.quit, iconset['exit']]}
 
@@ -153,6 +152,10 @@ class PympGUI(QMainWindow):
         for (k,v) in self.actionsDict.items():
             (_name, _shortcut, _statustip, _action, _icon) = v
             self.actions[k] = self.qtregister_action(_name, _shortcut, _statustip, _action, _icon)
+
+    def _reconnect_actions(self):
+        self.actions['addCollection'].triggered.connect(self.colPanel.addCollection)
+        self.actions['shuffle'].triggered.connect(self.plsPanel.model.shuffle)
 
     def _init_menubar(self):
         menubar = self.menuBar()
@@ -189,12 +192,13 @@ class PympGUI(QMainWindow):
     def defAction(self):
         raise NotImplementedError
 
-    def qtregister_action(self, name, shortcut, statustip, triggeraction, image):
-        ''' TODO: register a qt-action the lazy way'''
+    def qtregister_action(self, name, shortcut, statustip,
+                                triggeraction=defAction, image=None):
         action = QAction(QIcon(image), name, self)
         action.setShortcut(shortcut)
         action.setStatusTip(statustip)
-        action.triggered.connect(triggeraction)
+        if triggeraction != self.defAction:
+            action.triggered.connect(triggeraction)
         return action
 
     def lookandfeel(self):
@@ -219,15 +223,25 @@ class PympGUI(QMainWindow):
 
     def _handle_repeat(self):
         PYMPENV.toggle('REPEAT')
+        if PYMPENV['REPEAT']:
+            self.player.finishedSong.connect(self.plsPanel.next_path)
+        else:
+            self.player.finishedSong.disconnect(self.plsPanel.next_path)
 
     def _handle_auto_focus(self):
         PYMPENV.toggle('AUTO_FOCUS')
+
+    def _player_stopped(self):
+        logger.info(':stopped')
 
     def showEvent(self, arg1):
         ''' show user interface '''
         # NOW init player, after gui shows up
         self.player = Player(self)
         # connect some actions
+        if PYMPENV['REPEAT']:
+            self.player.finishedSong.connect(self.plsPanel.next_path)
+        self.player.finishedSong.connect(self._player_stopped)
         self.controlBar.togCollection.connect(self.toggleCollection)
         self.controlBar.togRandom.connect(self._handle_random)
         self.controlBar.togRepeat.connect(self._handle_repeat)
@@ -257,12 +271,10 @@ class PympGUI(QMainWindow):
         self.player.sldMove.connect(self.controlBar.set_time)
         self.player.timeScratched.connect(self.controlBar.timeChangeValue)
         self.player.volScratched.connect(self.controlBar.volChangeValue)
+        self.player.finishedSong.connect(self._player_stopped)
         self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
         self.searchBarPlaylist.clearSearch.connect(self.plsPanel.search)
         self.searchBarPlaylist.timerExpired.connect(self.plsPanel.search)
         self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
         self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
-        # IF REPEAT...
-        self.player.finishedSong.connect(self.plsPanel.next_path)
-        #self.searchBarPlaylist.search.connect(self.plsPanel.usePattern)
         self.plsPanel.enqueue.connect(self.queuedlg.append)

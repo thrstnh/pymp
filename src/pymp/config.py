@@ -1,11 +1,12 @@
 import sys
 import os
 import os.path
-import time
+import copy
 import json
 from os.path import expanduser
 from os.path import join
 from .logger import init_logger
+
 
 ENCODING = sys.stdout.encoding or sys.getfilesystemencoding()
 PYMPENV = None
@@ -33,6 +34,7 @@ class PropertyDict(dict):
 
 
 class PympEnv(PropertyDict):
+
     _VALID_KEYS = set([
             'DEBUG', 'APP', 'VERSION',
             'FILE_DB',
@@ -41,7 +43,7 @@ class PympEnv(PropertyDict):
             'SHOW_LYRIC', 'SHOW_COLLECTION',
             'LFM_LOGIN', 'LFM_SCROBBLE', 'LFM_NOW_PLAYING',
             'COLLECTION_CURRENT',
-            'CURRENT_TRACK', 'CURRENT_DMP3',
+            'CURRENT_TRACK', 'CURRENT_DMP3', 'LAST_TRACK',
             'DROP_ID',
             'ICONSET_NAME', 'ICONSET_PATH',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
@@ -74,6 +76,7 @@ class PympEnv(PropertyDict):
         self['COLLECTION_CURRENT'] = ''
         self['CURRENT_TRACK'] = None
         self['CURRENT_DMP3'] = None
+        self['LAST_TRACK'] = None
         self['DROP_ID'] = 6666666
         self['ICONSET_NAME'] = 'default'
         self['ICONSET_PATH'] = 'pymp/icons/iconsets/default/'
@@ -94,7 +97,7 @@ class PympEnv(PropertyDict):
     def toggle(self, key):
         self[key] = not self[key]
         self.save()
-        logger.info(':tog {} -> {}'.format(key, self[key]))
+        logger.info(':tog  {} -> {}'.format(key, self[key]))
 
     def toggle_mute(self):
         self.toggle('MUTE')
@@ -106,12 +109,16 @@ class PympEnv(PropertyDict):
         self.toggle('SHOW_COLLECTION')
 
     def save(self):
+        me = copy.deepcopy(self)
+        del me['CURRENT_TRACK']
         with open(FILE_CONFIG, 'w') as fp:
-            fp.write(str(self))
+            fp.write(json.dumps(me, sort_keys=True, indent=4))
 
     def load(self):
-        conf = self._load_config()
-        self.update(conf)
+        try:
+            self.update(self._load_config())
+        except:
+            self._init_defaults()
 
     def _load_config(self):
         with open(FILE_CONFIG) as fp:
@@ -129,7 +136,7 @@ def init_env():
 
 PYMPENV = init_env()
 logger.debug(':env\n{}'.format('\n'.join(
-                [' {} -> {}'.format(k, v)
+                ['    {:20} -> {}'.format(k, v)
                     for k,v in PYMPENV.items()])))
 
 if not os.path.exists(ROOT_DIR):
