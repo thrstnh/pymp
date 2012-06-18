@@ -110,7 +110,8 @@ class PympEnv(PropertyDict):
 
     def save(self):
         me = copy.deepcopy(self)
-        del me['CURRENT_TRACK']
+        if me['CURRENT_TRACK']:
+            del me['CURRENT_TRACK']
         with open(FILE_CONFIG, 'w') as fp:
             fp.write(json.dumps(me, sort_keys=True, indent=4))
 

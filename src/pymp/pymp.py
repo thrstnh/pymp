@@ -255,6 +255,7 @@ class PympGUI(QMainWindow):
         self.controlBar.onNext.connect(self.plsPanel.next_path)
         self.controlBar.onNext.connect(self.trackInfo.update_env)
         self.controlBar.onShuffle.connect(self.plsPanel.model.shuffle)
+        self.controlBar.onFocus.connect(self.plsPanel.select_playing)
         self.controlBar.togMute.connect(self.player.mute)
         self.controlBar.onVolume.connect(self.player.volume)
         self.controlBar.onTime.connect(self.player.time)

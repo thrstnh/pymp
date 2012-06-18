@@ -22,6 +22,7 @@ class ControlBar(QWidget):
     onVolume = pyqtSignal(int)
     onTime = pyqtSignal(int)
     onShuffle = pyqtSignal()
+    onFocus = pyqtSignal()
     togFocus = pyqtSignal()
     togLyric = pyqtSignal()
     togCollection = pyqtSignal()
@@ -44,7 +45,8 @@ class ControlBar(QWidget):
         play = BaseButton(self.onPlay.emit, iconset['playback_play'])
         nxt = BaseButton(self.onNext.emit, iconset['playback_next'])
         shuffle = BaseButton(self.onShuffle.emit, iconset['shuffle'])
-        focus = ToggleButton(PYMPENV['AUTO_FOCUS'], self.togFocus.emit,
+        focus = BaseButton(self.onFocus.emit, iconset['search'])
+        auto_focus = ToggleButton(PYMPENV['AUTO_FOCUS'], self.togFocus.emit,
                             iconset['focus_t'], iconset['focus_f'])
         random = ToggleButton(PYMPENV['RANDOM'], self.togRandom.emit,
                             iconset['random_t'], iconset['random_f'])
@@ -81,6 +83,7 @@ class ControlBar(QWidget):
         hbox.addWidget(random)
         hbox.addWidget(repeat)
         hbox.addWidget(focus)
+        hbox.addWidget(auto_focus)
         hbox.addWidget(self.sldVol)
         hbox.addWidget(self.tstart)
         hbox.addWidget(self.sldTime, 1)

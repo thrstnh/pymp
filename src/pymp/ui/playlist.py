@@ -183,6 +183,11 @@ class PlaylistPanel(QWidget):
         signal.emit(cpath)
         return cpath
 
+    def select_playing(self):
+        self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.tbl.selectRow(self._index_playing.row())
+        self.tbl.emit(SIGNAL("layoutChanged()"))
+
     def prev_path(self):
         if PYMPENV['RANDOM']:
             row = self._random()
