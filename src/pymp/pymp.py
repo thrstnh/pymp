@@ -246,47 +246,46 @@ class PympGUI(QMainWindow):
         logger.info(':stopped')
 
     def showEvent(self, arg1):
-        ''' show user interface '''
-        # NOW init player, after gui shows up
         self.player = Player(self)
-        # connect some actions
         if PYMPENV['REPEAT']:
             self.player.finishedSong.connect(self.plsPanel.next_path)
         else:
             self.player.finishedSong.connect(self._player_stopped)
-        self.controlBar.togCollection.connect(self.toggleCollection)
-        self.controlBar.togRandom.connect(self._handle_random)
-        self.controlBar.togRepeat.connect(self._handle_repeat)
-        self.controlBar.togLyric.connect(self.toggleLyric)
-        self.controlBar.onPrev.connect(self.plsPanel.prev_path)
-        self.controlBar.onPrev.connect(self.trackInfo.update_env)
-        self.controlBar.onStop.connect(self.player.stop)
-        self.controlBar.onStop.connect(self.trackInfo.update_env)
-        self.controlBar.onPlay.connect(self.plsPanel.current_path)
-        self.controlBar.onPlay.connect(self.trackInfo.update_env)
-        self.controlBar.onNext.connect(self.plsPanel.next_path)
-        self.controlBar.onNext.connect(self.trackInfo.update_env)
-        self.controlBar.onShuffle.connect(self.plsPanel.model.shuffle)
-        self.controlBar.onFocus.connect(self.plsPanel.select_playing)
-        self.controlBar.togMute.connect(self.player.mute)
-        self.controlBar.onVolume.connect(self.player.volume)
-        self.controlBar.onTime.connect(self.player.time)
-        self.controlBar.clearPlaylist.connect(self.plsPanel.clearPlaylist)
-        self.controlBar.togFocus.connect(self._handle_auto_focus)
-        self.plsPanel.playCurrent.connect(self.player.play)
-        self.plsPanel.playCurrent.connect(self.trackInfo.update)
-        self.plsPanel.playNext.connect(self.player.play)
-        self.plsPanel.playNext.connect(self.trackInfo.update)
-        self.plsPanel.playPrev.connect(self.player.play)
-        self.plsPanel.playPrev.connect(self.trackInfo.update)
-        self.player.timeStart.connect(self.controlBar.setTimeStart)
-        self.player.timeTotal.connect(self.controlBar.setTimeTotal)
-        self.player.sldMove.connect(self.controlBar.set_time)
-        self.player.timeScratched.connect(self.controlBar.timeChangeValue)
-        self.player.volScratched.connect(self.controlBar.volChangeValue)
-        self.trackInfo.fetchLyrics.connect(self.lyricPanel.search)
-        self.searchBarPlaylist.clearSearch.connect(self.plsPanel.search)
-        self.searchBarPlaylist.timerExpired.connect(self.plsPanel.search)
-        self.searchBarCollection.timerExpired.connect(self.colPanel.usePattern)
-        self.searchBarCollection.clearSearch.connect(self.colPanel.usePattern)
-        self.plsPanel.enqueue.connect(self.queuedlg.append)
+        self.connections = {
+                self.controlBar.togCollection: [self.toggleCollection],
+                self.controlBar.togRandom: [self._handle_random],
+                self.controlBar.onPrev: [self.trackInfo.update_env,
+                                         self.plsPanel.prev_path],
+                self.controlBar.onStop: [self.trackInfo.update_env,
+                                         self.player.stop],
+                self.controlBar.onPlay: [self.plsPanel.current_path,
+                                         self.trackInfo.update_env],
+                self.controlBar.onNext: [self.plsPanel.next_path,
+                                         self.trackInfo.update_env],
+                self.controlBar.togRepeat: [self._handle_repeat],
+                self.controlBar.togLyric: [self.toggleLyric],
+                self.controlBar.onShuffle: [self.plsPanel.model.shuffle],
+                self.controlBar.onFocus: [self.plsPanel.select_playing],
+                self.controlBar.togMute: [self.player.mute],
+                self.controlBar.onVolume: [self.player.volume],
+                self.controlBar.onTime: [self.player.time],
+                self.controlBar.clearPlaylist: [self.plsPanel.clearPlaylist],
+                self.controlBar.togFocus: [self._handle_auto_focus],
+                self.plsPanel.playCurrent: [self.player.play,
+                                            self.trackInfo.update],
+                self.plsPanel.playNext: [self.player.play,
+                                         self.trackInfo.update],
+                self.plsPanel.playPrev: [self.player.play,
+                                         self.trackInfo.update],
+                self.plsPanel.enqueue: [self.queuedlg.append],
+                self.player.timeStart: [self.controlBar.setTimeStart],
+                self.player.timeTotal: [self.controlBar.setTimeTotal],
+                self.player.sldMove: [self.controlBar.set_time],
+                self.player.timeScratched: [self.controlBar.timeChangeValue],
+                self.player.volScratched: [self.controlBar.volChangeValue],
+                self.trackInfo.fetchLyrics: [self.lyricPanel.search],
+                self.searchBarPlaylist.clearSearch: [self.plsPanel.search],
+                self.searchBarPlaylist.timerExpired: [self.plsPanel.search],
+                self.searchBarCollection.clearSearch: [self.colPanel.usePattern],
+                self.searchBarCollection.timerExpired: [self.colPanel.usePattern]}
+        [map(signal.connect, slots) for signal, slots in self.connections.items()]
