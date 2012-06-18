@@ -259,6 +259,7 @@ class PMP3(object):
                     d[f] = u"%s" % item
             d['TLEN'] = self.length
             d['BITR'] = self.bitrate or ''
+            d['PATH'] = self.path
             return d
         return {}
 

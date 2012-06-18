@@ -1,25 +1,22 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from ..mp3 import PMP3
 from ..config import init_env
 
 PYMPENV = init_env()
 
 
 class TrackInfoBar(QWidget):
-    '''
-        Track Information Panel with current track
-    '''
-    # fetch lyrics with new track information to keep the right chain
+
     fetchLyrics = pyqtSignal(QString, QString)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self._init()
-        self.initUI()
+        self._init_ui()
 
     def _init(self):
         self.track = dict()
+        self.track['path'] = ''
         self.track['artist'] = ''
         self.track['title'] = ''
         self.track['album'] = ''
@@ -27,41 +24,31 @@ class TrackInfoBar(QWidget):
         self.track['tracknr'] = ''
         self.track['genre'] = ''
 
-    def initUI(self):
-        ''' TODO: init user interface '''
+    def _init_ui(self):
         self.customLabel = QLabel(self)
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.customLabel)
         vbox.addLayout(hbox)
 
-    def update(self, qstr):
-        '''
-            fill fields with data
-        '''
-        if not qstr:
-            self._init()
-            self.updateInformation()
-            return
+    def update_env(self):
         ct = PYMPENV['CURRENT_TRACK']
+        self.track['PATH'] = ct.path
         self.track['artist'] = ct.artist
         self.track['title'] = ct.title
         self.track['album'] = ct.album
         self.track['year'] = ct.year
         self.track['tracknr'] = ct.trackno
         self.track['genre'] = ct.genre
-        self.updateInformation()
+        self.update_information()
         if PYMPENV['SHOW_LYRIC'] \
                 and self.track['artist'] \
                 and self.track['title']:
             self.fetchLyrics.emit(self.track.get('artist', QString('')),
                                   self.track.get('title', QString('')))
 
-    def updateLabels(self):
-        self._init()
-        self.updateInformation()
-
-    def updateInformation(self):
-        ''' sync vars with gui-labels '''
-        tx = '{artist}\t-\t{title}\n{album}\t({year},{tracknr}\t{genre})'.format(**self.track)
+    def update_information(self):
+        tx = self.track['PATH']
+        if self.track['artist'] and self.track['title']:
+            tx = '{artist}\t-\t{title}\n{album}\t({year},{tracknr}\t{genre})'.format(**self.track)
         self.customLabel.setText(tx)
