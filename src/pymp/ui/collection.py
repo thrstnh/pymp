@@ -52,6 +52,7 @@ class CollectionPanel(QWidget):
         self.model.setPattern(pattern)
         if pattern:
             self.tre.expandAll()
+        self.parent.setFocus(True)
 
     def _dclick_timeout(self):
         '''
@@ -61,6 +62,7 @@ class CollectionPanel(QWidget):
         index = self.idx
         self.tre.setExpanded(index, not self.tre.isExpanded(index))
         self._dclick_timer.stop()
+        self.parent.setFocus(True)
 
     def clicked(self, index):
         '''
@@ -79,6 +81,7 @@ class CollectionPanel(QWidget):
             self.parent.update_statusbar()
         else:
             self._dclick_timer.start(300)
+        self.parent.setFocus(True)
 
     def _add_child_nodes(self, node):
         '''

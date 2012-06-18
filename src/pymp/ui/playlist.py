@@ -212,12 +212,14 @@ class PlaylistPanel(QWidget):
         logger.info('playlist clicked {}, {}'.format(idx.row(), idx.column()))
         self._index_selected = idx
         self.tbl.selectRow(idx.row())
+        self.parent.setFocus(True)
 
     def double_clicked(self, idx):
         ''' double click on playlist emits playCurrent signal '''
         self._index_playing = idx
         cpath = self._get_path(idx.row())
         self.playCurrent.emit(cpath)
+        self.parent.setFocus(True)
         return cpath
 
 #    def activated(self):

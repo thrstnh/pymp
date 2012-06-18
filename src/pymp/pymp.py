@@ -29,6 +29,15 @@ class PympGUI(QMainWindow):
         self._reconnect_actions()
         self.update_statusbar('Ready.')
         self.show()
+        self.setFocus(True)
+
+    def keyPressEvent(self, event):
+        logger.info(':key {}'.format(event.key()))
+        if event.key() == Qt.Key_J:
+            logger.info(':focus searchBarPlaylist')
+            self.searchBarPlaylist.setFocus(True)
+        else:
+            QMainWindow.keyPressEvent(self, event)
 
     def __init_pymp_gui(self):
 #        self.setStyleSheet(css)
