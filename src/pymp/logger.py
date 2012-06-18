@@ -6,7 +6,7 @@ def now():
     return time.strftime(TIME_PATTERN)
 
 logger = None
-PATTERN = '%(asctime)s::%(levelname)s:: %(message)s'
+PATTERN = '%(asctime)s::%(levelname)s::%(message)s'
 TIME_PATTERN = '%Y%m%d%H%M%S'
 LOG_DIR = expanduser('~/.pymp/log')
 LOG_FILE = join(LOG_DIR, 'pympsession{}.log'.format(now()))
@@ -28,4 +28,5 @@ def init_logger():
     return logger
 
 logger = init_logger()
-logger.info(':log {}'.format(LOG_FILE))
+logger.debug(':start {}'.format(now()))
+logger.debug(':log {}'.format(LOG_FILE))

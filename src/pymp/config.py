@@ -14,11 +14,7 @@ ROOT_DIR = expanduser('~/.pymp')
 FILE_CONFIG = join(ROOT_DIR, 'config')
 TIME_PATTERN = '%Y-%m-%d--%H:%M:%S'
 
-def now():
-    return time.strftime(TIME_PATTERN)
-
 logger = init_logger()
-logger.debug(':start {}'.format(now()))
 logger.debug(':HOME {}'.format(ROOT_DIR))
 logger.debug(':encoding {}'.format(ENCODING))
 
@@ -128,7 +124,6 @@ class PympEnv(PropertyDict):
 def init_env():
     global PYMPENV
     if not PYMPENV:
-        logger.info('init_env')
         PYMPENV = PympEnv()
     return PYMPENV
 
