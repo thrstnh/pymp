@@ -274,6 +274,7 @@ class PympGUI(QMainWindow):
                 self.plsPanel.playPrev: [self.player.play,
                                          self.trackInfo.update],
                 self.plsPanel.enqueue: [self.queuedlg.append],
+                self.plsPanel.filled: [self.searchBarPlaylist.delay],
                 self.player.timeStart: [self.controlBar.setTimeStart],
                 self.player.timeTotal: [self.controlBar.setTimeTotal],
                 self.player.sldMove: [self.controlBar.set_time],

@@ -1,12 +1,13 @@
+import time
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from .widgets import BaseButton
+from ..logger import init_logger
+
+logger = init_logger()
 
 
 class SearchBar(QWidget):
-    '''
-        Control Panel for search patterns
-    '''
     search = pyqtSignal(QString)
     clearSearch = pyqtSignal(QString)
     timerExpired = pyqtSignal(QString)
@@ -16,6 +17,8 @@ class SearchBar(QWidget):
         self._search_timer = QTimer(self)
         self._timeout = timeout
         self._image = image
+        self._clicked = 0
+        self._delay = 0
         self.initUI()
 
     def initUI(self):
@@ -34,12 +37,6 @@ class SearchBar(QWidget):
     def txChanged(self, t):
         self.pattern = self.line.text()
         self.search.emit(self.pattern)
-
-        '''
-            start a double click timer for 300ms.
-            if dclick: fill playlist with node-children
-            if singleclick: open tree node
-        '''
         if self._search_timer.isActive():
             self._search_timer.stop()
         self._search_timer.start(self._timeout)
@@ -48,10 +45,22 @@ class SearchBar(QWidget):
         self.search.emit(self.pattern)
 
     def clrSearch(self):
+        self._clicked = time.time()
+        logger.debug(':clrSearch')
         self.pattern = ''
         self.line.setText(self.pattern)
         self.clearSearch.emit(self.pattern)
 
     def searchTimeout(self):
         self._search_timer.stop()
+        diff_max = self._delay + self._timeout / 1000.
+        if self._clicked:
+            tdiff = (time.time() - self._clicked)
+            if tdiff > diff_max:
+                self.timerExpired.emit(self.pattern)
+                self._clicked = 0
+            return
         self.timerExpired.emit(self.pattern)
+
+    def delay(self, delay):
+        self._delay = delay

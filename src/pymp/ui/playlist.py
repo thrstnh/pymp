@@ -18,6 +18,7 @@ class PlaylistPanel(QWidget):
     playNext = pyqtSignal(QString)
     enqueue = pyqtSignal(list)
     dequeue = pyqtSignal(list)
+    filled = pyqtSignal(float)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -111,7 +112,9 @@ class PlaylistPanel(QWidget):
                     self.tbl.emit(SIGNAL("layoutChanged()"))
         self.init_hdr()
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.rowCount(None)))
-        logger.info(':fill {}s'.format(time.time() - tstart))
+        tdiff = time.time() - tstart
+        self.filled.emit(tdiff)
+        logger.info(':fill {}s'.format(tdiff))
 
     def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
         r'''example:
