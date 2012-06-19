@@ -26,6 +26,7 @@ class PlaylistPanel(QWidget):
         # current tracks
         self.tracks = {}
         self.parent = parent
+        self._current_index = 0
 
     def initUI(self):
         self.tbl = myQTableView(self)
@@ -70,6 +71,8 @@ class PlaylistPanel(QWidget):
         self.tbl.emit(SIGNAL("layoutChanged()"))
 
     def popup(self, point):
+        if self._table_empty():
+            return
         idx = self.tbl.selectionModel().currentIndex()
         data = self.model.data_row(idx.row())
 
@@ -149,10 +152,13 @@ class PlaylistPanel(QWidget):
         return cpath
 
     def _random(self):
-        index = random.randint(0, self.model.length())
+        if self._table_empty():
+            return
+        rows = self.model.rowCount(None)
+        index = random.randint(0, rows)
         if not PYMPENV['FAST_CLIENT']:
             return index
-        seq = range(0, self.model.length())
+        seq = range(0, rows)
         for _ in range(random.randint(0, 7)):
             random.shuffle(seq)
         val = seq[index]
@@ -170,45 +176,63 @@ class PlaylistPanel(QWidget):
         row = self._row_valid(row)
         self._index_playing \
                 = self._index_playing.sibling(row,
-                        self._index_playing.column())
-        self._index_selected = self._index_playing
+                                        self._index_playing.column())
         if PYMPENV['AUTO_FOCUS']:
             self.tbl.selectRow(row)
+            self.tbl.scrollTo(self._index_playing, QAbstractItemView.PositionAtCenter)
         cpath = self._get_path(row)
         signal.emit(cpath)
         return cpath
 
     def select_playing(self):
+        if self._table_empty():
+            return
         self.tbl.setFocus(True)
         self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
-        row = self._index_playing.row()
-        logger.debug(':focus row {}'.format(row))
-        self.tbl.selectRow(row)
+        self.tbl.selectRow(self._index_playing.row())
+        self.tbl.scrollTo(self._index_playing, QAbstractItemView.PositionAtCenter)
         self.tbl.emit(SIGNAL("layoutChanged()"))
         self.parent.setFocus(True)
 
     def prev_path(self):
+        if self._table_empty():
+            return
         if PYMPENV['RANDOM']:
-            row = self._random()
+            self._current_index = self._random()
         else:
-            row = self._index_playing.row() - 1
-        return self._change_index(row, self.playPrev)
+            self._current_index -= 1
+            if self._current_index < 0:
+                self._current_index = self.model.length() - 1
+        return self._change_index(self._current_index, self.playPrev)
 
     def next_path(self):
+        if self._table_empty():
+            return
         if PYMPENV['RANDOM']:
-            row = self._random()
+            self._current_index = self._random()
         else:
-            row = self._index_playing.row() + 1
-        return self._change_index(row, self.playNext)
+            self._current_index += 1
+            if self._current_index > self.model.length():
+                self._current_index = 0
+        return self._change_index(self._current_index, self.playNext)
+
+    def _table_empty(self):
+        empty = self.model.length() == 0
+        if not empty:
+            self.tbl.selectRow(1)
+            self._index_playing = self.tbl.currentIndex()
+        return empty
 
     def current_path(self):
-        cpath = self._get_path(self._index_selected.row())
+        if self._table_empty():
+            return
+        self._current_index = self._index_selected.row()
+        cpath = self._get_path(self._current_index)
         self._index_playing = self._index_selected
         self.playCurrent.emit(cpath)
         return cpath
 
     def clicked(self, idx):
-        logger.info('playlist clicked {}, {}'.format(idx.row(), idx.column()))
         self._index_selected = idx
         self.tbl.selectRow(idx.row())
         self.parent.setFocus(True)
@@ -216,6 +240,7 @@ class PlaylistPanel(QWidget):
     def double_clicked(self, idx):
         ''' double click on playlist emits playCurrent signal '''
         self._index_playing = idx
+        self._current_index = self._index_selected.row()
         cpath = self._get_path(idx.row())
         self.playCurrent.emit(cpath)
         self.parent.setFocus(True)

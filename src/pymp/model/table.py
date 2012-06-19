@@ -63,7 +63,7 @@ class MyTableModel(QAbstractTableModel):
         return self.length() > 0
 
     def length(self):
-        return len(self.arraydata) or 1
+        return len(self.arraydata)
 
     def shuffle(self):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))

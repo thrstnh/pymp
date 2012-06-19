@@ -118,6 +118,7 @@ class PympEnv(PropertyDict):
     def load(self):
         try:
             self.update(self._load_config())
+            self['CURRENT_TRACK'] = None
         except:
             self._init_defaults()
 

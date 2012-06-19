@@ -35,6 +35,8 @@ class Player(QObject):
 #        self._update_labels()
 
     def play(self, cpath):
+        if not cpath:
+            return
         self.player.setCurrentSource(Phonon.MediaSource(cpath))
         PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
         #PYMPENV['CURRENT_DMP3'] = DMP3(cpath)

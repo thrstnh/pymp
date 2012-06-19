@@ -45,6 +45,8 @@ class SearchBar(QWidget):
         self.search.emit(self.pattern)
 
     def clrSearch(self):
+        if not self.pattern:
+            return
         self._clicked = time.time()
         logger.debug(':clrSearch')
         self.pattern = ''

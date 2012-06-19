@@ -16,7 +16,7 @@ class TrackInfoBar(QWidget):
 
     def _init(self):
         self.track = dict()
-        self.track['path'] = ''
+        self.track['PATH'] = ''
         self.track['artist'] = ''
         self.track['title'] = ''
         self.track['album'] = ''
@@ -33,6 +33,10 @@ class TrackInfoBar(QWidget):
 
     def update_env(self):
         ct = PYMPENV['CURRENT_TRACK']
+        if not ct:
+            self.update_information()
+            return
+        self.track = dict()
         self.track['PATH'] = ct.path
         self.track['artist'] = ct.artist
         self.track['title'] = ct.title
