@@ -55,12 +55,9 @@ class myQTableView(QTableView):
 class MyTableModel(QAbstractTableModel):
 
     def __init__(self, parent=None, *args):
-        QAbstractTableModel.__init__(self, parent, *args)
-        #self.arraydata = datain
-        #self.headerdata = headerdata
-
-        self.arraydata = []#[[QString(u'32508'), 'P.O.S.', '(hed) p.e.', '(hed) p.e.', 'Crossover', '1997', '03:13', '01/13', '//media/music/MP3-jollyroger/Alben/hed p.e./(hed) p.e.-1997-(hed) p.e/01 P.O.S..mp3'],]
+        self.arraydata = []
         self.headerkeys, self.headerdata = self._init_tbl_columns()
+        QAbstractTableModel.__init__(self, parent, *args)
 
     def empty(self):
         return self.length() > 0

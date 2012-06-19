@@ -39,7 +39,8 @@ class Player(QObject):
         PYMPENV['CURRENT_TRACK'] = PMP3(cpath)
         #PYMPENV['CURRENT_DMP3'] = DMP3(cpath)
         self.player.play()
-        logger.info('now playing:\n{}'.format(
+        if PYMPENV['CURRENT_TRACK']:
+            logger.info('now playing:\n{}'.format(
                     '\n'.join(['  {} -> {}'.format(k,v)
                         for k,v in PYMPENV['CURRENT_TRACK'].all().items()])))
 

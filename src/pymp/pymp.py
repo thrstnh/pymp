@@ -26,7 +26,6 @@ class PympGUI(QMainWindow):
         self._compute_actions()
         self._init_menubar()
         self.setCentralWidget(self._init_ctrls())
-        self._reconnect_actions()
         self.update_statusbar('Ready.')
         self.show()
         self.setFocus(True)
@@ -160,11 +159,8 @@ class PympGUI(QMainWindow):
         # compute actions-dict
         for (k,v) in self.actionsDict.items():
             (_name, _shortcut, _statustip, _action, _icon) = v
-            self.actions[k] = self.qtregister_action(_name, _shortcut, _statustip, _action, _icon)
-
-    def _reconnect_actions(self):
-        self.actions['addCollection'].triggered.connect(self.colPanel.addCollection)
-        self.actions['shuffle'].triggered.connect(self.plsPanel.model.shuffle)
+            self.actions[k] = self.qtregister_action(_name, _shortcut, _statustip,
+                                                     _action, _icon)
 
     def _init_menubar(self):
         menubar = self.menuBar()
@@ -218,7 +214,7 @@ class PympGUI(QMainWindow):
         QApplication.setStyle(QStyleFactory.create(self.uistyles[self.uistyleid]))
         QApplication.setPalette(QApplication.style().standardPalette())
 
-    def update_labels(self):
+    def update_env(self):
         logger.info('update labels')
 
     def update_statusbar(self, msg=''):
@@ -287,5 +283,8 @@ class PympGUI(QMainWindow):
                 self.searchBarPlaylist.clearSearch: [self.plsPanel.search],
                 self.searchBarPlaylist.timerExpired: [self.plsPanel.search],
                 self.searchBarCollection.clearSearch: [self.colPanel.usePattern],
-                self.searchBarCollection.timerExpired: [self.colPanel.usePattern]}
+                self.searchBarCollection.timerExpired: [self.colPanel.usePattern],
+                # menuBar
+                self.actions['addCollection'].triggered: [self.colPanel.addCollection],
+                self.actions['shuffle'].triggered: [self.plsPanel.model.shuffle]}
         [map(signal.connect, slots) for signal, slots in self.connections.items()]

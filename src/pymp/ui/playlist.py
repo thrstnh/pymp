@@ -12,13 +12,6 @@ PYMPENV = init_env()
 
 
 class PlaylistPanel(QWidget):
-    '''
-        Playlist Table
-
-        click
-        dclick
-
-    '''
     # send signal on double click
     playCurrent = pyqtSignal(QString)
     playPrev = pyqtSignal(QString)
@@ -34,8 +27,7 @@ class PlaylistPanel(QWidget):
         self.parent = parent
 
     def initUI(self):
-        ''' TODO: init user interface '''
-        self.tbl = myQTableView(self) #QTableView(self)
+        self.tbl = myQTableView(self)
         self.model = MyTableModel()
         self.tbl.setModel(self.model)
         self.tbl.setShowGrid(False)
@@ -184,9 +176,13 @@ class PlaylistPanel(QWidget):
         return cpath
 
     def select_playing(self):
+        self.tbl.setFocus(True)
         self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self.tbl.selectRow(self._index_playing.row())
+        row = self._index_playing.row()
+        logger.debug(':focus row {}'.format(row))
+        self.tbl.selectRow(row)
         self.tbl.emit(SIGNAL("layoutChanged()"))
+        self.parent.setFocus(True)
 
     def prev_path(self):
         if PYMPENV['RANDOM']:
