@@ -19,6 +19,7 @@ class SearchBar(QWidget):
         self._image = image
         self._clicked = 0
         self._delay = 0
+        self.pattern = None
         self.initUI()
 
     def initUI(self):
