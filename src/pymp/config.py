@@ -141,12 +141,6 @@ logger.debug(':env\n{}'.format('\n'.join(
                 ['    {:20} -> {}'.format(k, v)
                     for k,v in PYMPENV.items()])))
 
-if not os.path.exists(ROOT_DIR):
-    logger.info('create ~/.pymp files')
-    os.mkdir(PYMPENV['DIR_ROOT'])
-    os.mkdir(PYMPENV['DIR_LOG'])
-    os.mkdir(PYMPENV['DIR_LYRICS'])
-
 
 class Entry(PropertyDict):
 
