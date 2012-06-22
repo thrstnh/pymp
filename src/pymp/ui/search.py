@@ -19,6 +19,7 @@ class SearchBar(QWidget):
         self._image = image
         self._clicked = 0
         self._delay = 0
+        self._return_invoked = False
         self.pattern = None
         self.initUI()
 
@@ -43,27 +44,35 @@ class SearchBar(QWidget):
         self._search_timer.start(self._timeout)
 
     def txReturn(self):
+        self._return_invoked = True
+        logger.debug(':txReturn')
         self.search.emit(self.pattern)
+        self.__emit_timer()
 
     def clrSearch(self):
         if not self.pattern:
             return
+        self._return_invoked = False
         self._clicked = time.time()
-        logger.debug(':clrSearch')
         self.pattern = ''
         self.line.setText(self.pattern)
         self.clearSearch.emit(self.pattern)
 
     def searchTimeout(self):
         self._search_timer.stop()
-        diff_max = self._delay + self._timeout / 1000.
         if self._clicked:
+            diff_max = self._delay + self._timeout / 1000.
             tdiff = (time.time() - self._clicked)
             if tdiff > diff_max:
-                self.timerExpired.emit(self.pattern)
-                self._clicked = 0
-            return
+                if not self._return_invoked:
+                    self.__emit_timer()
+                    return
+        if not self._return_invoked:
+            self.__emit_timer()
+
+    def __emit_timer(self):
         self.timerExpired.emit(self.pattern)
+        self._clicked = 0
 
     def delay(self, delay):
         self._delay = delay
