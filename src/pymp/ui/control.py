@@ -57,15 +57,15 @@ class ControlBar(QWidget):
 
         self.sldVol = QSlider(Qt.Horizontal, self)
         self.sldVol.setFocusPolicy(Qt.NoFocus)
-        self.sldVol.valueChanged[int].connect(self.volChangeValue)
-        self.sldVol.valueChanged[int].connect(self.onVolume.emit)
+        self.sldVol.sliderMoved[int].connect(self.volChangeValue)
+        self.sldVol.sliderMoved[int].connect(self.onVolume.emit)
 
         self.tstart = QLabel("00:00", self)
 
         self.sldTime = QSlider(Qt.Horizontal, self)
         self.sldTime.setFocusPolicy(Qt.NoFocus)
-        self.sldTime.valueChanged[int].connect(self.timeChangeValue)
-        self.sldTime.valueChanged[int].connect(self.onTime.emit)
+        self.sldTime.sliderMoved[int].connect(self.timeChangeValue)
+        self.sldTime.sliderMoved[int].connect(self.onTime.emit)
 
         self.ttotal = QLabel("23:59", self)
 
