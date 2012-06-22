@@ -59,7 +59,7 @@ def _init_icon_set(icons):
     logger.info('init_icon_set')
     ret = {}
     for k, v in icons.items():
-        ret[k] = os.path.join(PYMPENV['ICONSET_PATH'], v)
+        ret[k] = os.path.join(PYMPENV['ICONSET']['default'], v)
     return ret
 
 iconset = _init_icon_set(iconsetDefault)

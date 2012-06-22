@@ -45,7 +45,7 @@ class PympEnv(PropertyDict):
             'COLLECTION_CURRENT',
             'CURRENT_TRACK', 'CURRENT_DMP3', 'LAST_TRACK',
             'DROP_ID',
-            'ICONSET_NAME', 'ICONSET_PATH',
+            'ICONSET',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
             'SEARCH_TIMEOUT',
             'TAG_UPDATE'])
@@ -78,17 +78,19 @@ class PympEnv(PropertyDict):
         self['CURRENT_DMP3'] = None
         self['LAST_TRACK'] = None
         self['DROP_ID'] = 6666666
-        self['ICONSET_NAME'] = 'default'
-        self['ICONSET_PATH'] = 'pymp/icons/iconsets/default/'
+        self['ICONSET'] = {'default': 'pymp/icons/iconsets/default/'}
         self['USE_SQL'] = False
         self['FAST_CLIENT'] = True
+        # focus track on next play
         self['AUTO_FOCUS'] = True
-        self['SEARCH_TIMEOUT'] = 300
+        self['SEARCH_TIMEOUT'] = 500
         # this is an option for collection rescan,
         # if it is True, the rescan of a collection
         # also checks for new or updated id3-tags,
         # otherwise only for new file in the collection.
         self['TAG_UPDATE'] = False
+        # do not exit; minimize
+        self['CLOSE_ON_HIDE'] = False
 
     def change_iconset(self, name, path):
         self['ICONSET_NAME'] = name
