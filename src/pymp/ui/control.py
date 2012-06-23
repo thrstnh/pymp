@@ -59,6 +59,7 @@ class ControlBar(QWidget):
         self.sldVol.setFocusPolicy(Qt.NoFocus)
         self.sldVol.sliderMoved[int].connect(self.volChangeValue)
         self.sldVol.sliderMoved[int].connect(self.onVolume.emit)
+        self.sldVol.setValue(PYMPENV['VOLUME'])
 
         self.tstart = QLabel("00:00", self)
 
@@ -103,6 +104,8 @@ class ControlBar(QWidget):
         self.sldTime.setValue(t)
 
     def volChangeValue(self, value):
+        PYMPENV['VOLUME'] = value
+        PYMPENV.save()
         self._slider_changed('volume', value)
 
     def timeChangeValue(self, value):

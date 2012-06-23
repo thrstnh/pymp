@@ -48,6 +48,7 @@ class PympEnv(PropertyDict):
             'ICONSET',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
             'SEARCH_TIMEOUT',
+            'VOLUME',
             'TAG_UPDATE'])
 
     def __init__(self):
@@ -81,6 +82,7 @@ class PympEnv(PropertyDict):
         self['ICONSET'] = {'default': 'pymp/icons/iconsets/default/'}
         self['USE_SQL'] = False
         self['FAST_CLIENT'] = True
+        self['VOLUME'] = 75
         # focus track on next play
         self['AUTO_FOCUS'] = True
         self['SEARCH_TIMEOUT'] = 500
