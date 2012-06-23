@@ -112,7 +112,8 @@ class MyTableModel(QAbstractTableModel):
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.headerdata[col])
+            if self.headerdata:
+                return QVariant(self.headerdata[col])
         return QVariant()
 
     def row_id(self, data):

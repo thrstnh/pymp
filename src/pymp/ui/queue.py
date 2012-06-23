@@ -10,10 +10,9 @@ logger = init_logger()
 PYMPENV = init_env()
 
 
-class QueueDialog(QDialog):
-
+class QueueDialog(QMainWindow):
     def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
         self.parent = parent
         self.initUI()
 
@@ -46,9 +45,9 @@ class QueueDialog(QDialog):
         hbox.addWidget(ok)
         hbox.addWidget(cancel)
         vbox.addLayout(hbox)
-
-        #hbox.addWidget(self.toolbar)
-        self.setModal(True)
+        layout = QFrame(self)
+        layout.setLayout(vbox)
+        self.setCentralWidget(layout)
         self.setWindowTitle('Queue Dialog')
         self.resize(800, 320)
 
