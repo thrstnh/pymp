@@ -29,6 +29,7 @@ class PlaylistPanel(QWidget):
         self._current_index = 0
         self._history = []
         self._history_level = -1
+        self._queue = []
 
     def initUI(self):
         self.tbl = myQTableView(self)
@@ -156,6 +157,9 @@ class PlaylistPanel(QWidget):
     def _current_row(self):
         return self.model.data_row(self._current_index)
 
+    def _current_row_selected(self):
+        return self.model.data_row(self._index_selected.row())
+
     def _random(self):
         if self._table_empty():
             return
@@ -220,6 +224,15 @@ class PlaylistPanel(QWidget):
         if self._table_empty():
             return
         self._history_level = -1
+        qitem = None
+        if not self.queue_empty():
+            qitem = self._queue.pop(0)
+            logger.debug(':queue {}'.format(qitem))
+            row = self.model.row_id(qitem)
+            if row:
+                self._current_index = row
+                self._change_index(self._current_index, self.playNext, False)
+                return
         if PYMPENV['RANDOM']:
             self._current_index = self._random()
         else:
@@ -275,3 +288,12 @@ class PlaylistPanel(QWidget):
 
     def appendModel(self, item):
         self.model.append(item)
+
+    def enqueue_track(self):
+        cr = self._current_row_selected()
+        logger.info(':enqueue {}'.format(cr))
+        self._queue.append(cr)
+        self.enqueue.emit(cr)
+
+    def queue_empty(self):
+        return len(self._queue) == 0

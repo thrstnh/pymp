@@ -35,6 +35,8 @@ class PympGUI(QMainWindow):
         if event.key() == Qt.Key_J:
             logger.info(':focus searchBarPlaylist')
             self.searchBarPlaylist.setFocus(True)
+        elif event.key() == Qt.Key_Q:
+            self.plsPanel.enqueue_track()
         else:
             QMainWindow.keyPressEvent(self, event)
 
