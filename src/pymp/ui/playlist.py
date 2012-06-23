@@ -104,12 +104,12 @@ class PlaylistPanel(QWidget):
         if not pattern:
             [self.appendModel(item) for (k, item) in self.tracks.items()]
         else:
-            pattern = str(pattern.toUtf8()).lower().split()
+            pattern = unicode(pattern).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear()
             self.tbl.emit(SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
-                if self.__valid_entry(v, map(str.strip, pattern), (1, 2, 3)):
+                if self.__valid_entry(v, map(unicode.strip, pattern), (1, 2, 3)):
                     self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
                     self.tbl.emit(SIGNAL("layoutChanged()"))
@@ -128,7 +128,7 @@ class PlaylistPanel(QWidget):
         '''
         if not case_sensitive:
             item = [s.lower() if isinstance(s, basestring) else s for s in item]
-            pattern = map(str.lower, pattern)
+            pattern = map(unicode.lower, pattern)
         # mode: or
         mor = True if 'or' in pattern else False
         # mode: and

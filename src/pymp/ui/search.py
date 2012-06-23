@@ -37,7 +37,7 @@ class SearchBar(QWidget):
         hbox.addWidget(self.line, 1)
 
     def txChanged(self, t):
-        self.pattern = self.line.text()
+        self.pattern = unicode(self.line.text())
         self.search.emit(self.pattern)
         if self._search_timer.isActive():
             self._search_timer.stop()
@@ -45,7 +45,6 @@ class SearchBar(QWidget):
 
     def txReturn(self):
         self._return_invoked = True
-        logger.debug(':txReturn')
         self.search.emit(self.pattern)
         self.__emit_timer()
 
@@ -66,7 +65,7 @@ class SearchBar(QWidget):
             if tdiff > diff_max:
                 if not self._return_invoked:
                     self.__emit_timer()
-                    return
+            return
         if not self._return_invoked:
             self.__emit_timer()
 
