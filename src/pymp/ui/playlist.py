@@ -267,11 +267,11 @@ class PlaylistPanel(QWidget):
         ''' double click on playlist emits playCurrent signal '''
         self._index_playing = idx
         self._history_level = -1
-        self._history.append(self._current_row())
         self._current_index = self._index_selected.row()
         cpath = self._get_path(idx.row())
         self.playCurrent.emit(cpath)
         self.parent.setFocus(True)
+        self._history.append(self._current_row())
         return cpath
 
 #    def activated(self):
