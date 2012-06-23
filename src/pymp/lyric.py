@@ -1,9 +1,10 @@
 import os
 import lyricwiki
+import codecs
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from .logger import init_logger
-from .config import init_env
+from .config import init_env, ENCODING
 
 logger = init_logger()
 PYMPENV = init_env()
@@ -50,7 +51,7 @@ class LyricWorker(QThread):
         '''
         fp = os.path.join(PYMPENV['DIR_LYRICS'], "%s-%s.txt" % (self.artist, self.title))
         try:
-            with open(fp, 'r') as f:
+            with codecs.open(fp, 'r', ENCODING) as f:
                 lyr = f.read()
             return lyr
         except Exception, e:
