@@ -115,6 +115,12 @@ class MyTableModel(QAbstractTableModel):
             return QVariant(self.headerdata[col])
         return QVariant()
 
+    def row_id(self, data):
+        for idx, item in enumerate(self.arraydata):
+            if item[0] == data[0]:
+                return idx
+        return None
+
     def sort(self, nCol, order):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.arraydata = sorted(self.arraydata, key=operator.itemgetter(nCol))

@@ -27,6 +27,8 @@ class PlaylistPanel(QWidget):
         self.tracks = {}
         self.parent = parent
         self._current_index = 0
+        self._history = []
+        self._history_level = -1
 
     def initUI(self):
         self.tbl = myQTableView(self)
@@ -151,6 +153,9 @@ class PlaylistPanel(QWidget):
         cpath = QString(data[len(data)-1])
         return cpath
 
+    def _current_row(self):
+        return self.model.data_row(self._current_index)
+
     def _random(self):
         if self._table_empty():
             return
@@ -172,7 +177,7 @@ class PlaylistPanel(QWidget):
             return self.model.length() - 1
         return row
 
-    def _change_index(self, row, signal):
+    def _change_index(self, row, signal, append_history=True):
         row = self._row_valid(row)
         self._index_playing \
                 = self._index_playing.sibling(row,
@@ -180,6 +185,8 @@ class PlaylistPanel(QWidget):
         if PYMPENV['AUTO_FOCUS']:
             self.tbl.selectRow(row)
             self.tbl.scrollTo(self._index_playing, QAbstractItemView.PositionAtCenter)
+        if append_history:
+            self._history.append(self._current_row())
         cpath = self._get_path(row)
         signal.emit(cpath)
         return cpath
@@ -197,17 +204,22 @@ class PlaylistPanel(QWidget):
     def prev_path(self):
         if self._table_empty():
             return
-        if PYMPENV['RANDOM']:
-            self._current_index = self._random()
+        elif len(self._history) == 0:
+            logger.info(':history empty')
+        elif self._history_level <= - len(self._history):
+            logger.info(':history first')
         else:
-            self._current_index -= 1
-            if self._current_index < 0:
-                self._current_index = self.model.length() - 1
-        return self._change_index(self._current_index, self.playPrev)
+            self._history_level -= 1
+            last = self._history[self._history_level]
+            row = self.model.row_id(last)
+            if row:
+                self._current_index = row
+                self._change_index(self._current_index, self.playPrev, False)
 
     def next_path(self):
         if self._table_empty():
             return
+        self._history_level = -1
         if PYMPENV['RANDOM']:
             self._current_index = self._random()
         else:
@@ -226,6 +238,7 @@ class PlaylistPanel(QWidget):
     def current_path(self):
         if self._table_empty():
             return
+        self._history_level = -1
         self._current_index = self._index_selected.row()
         cpath = self._get_path(self._current_index)
         self._index_playing = self._index_selected
@@ -240,6 +253,8 @@ class PlaylistPanel(QWidget):
     def double_clicked(self, idx):
         ''' double click on playlist emits playCurrent signal '''
         self._index_playing = idx
+        self._history_level = -1
+        self._history.append(self._current_row())
         self._current_index = self._index_selected.row()
         cpath = self._get_path(idx.row())
         self.playCurrent.emit(cpath)
