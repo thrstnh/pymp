@@ -25,6 +25,7 @@ class PlaylistPanel(QWidget):
         self.initUI()
         # current tracks
         self.tracks = {}
+        self._track_list = []
         self.parent = parent
         self._current_index = 0
         self._history = []
@@ -96,7 +97,7 @@ class PlaylistPanel(QWidget):
     def search(self, pattern=''):
         tstart = time.time()
         if not pattern:
-            [self.appendModel(item) for (k, item) in self.tracks.items()]
+            self.model.set_data_(self._track_list)
         else:
             pattern = unicode(pattern).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
@@ -274,6 +275,7 @@ class PlaylistPanel(QWidget):
     def append(self, item):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.tracks[item[-1]] = item
+        self._track_list.append(item)
         self.tbl.append(item)
         self.emit(SIGNAL("layoutChanged()"))
 
