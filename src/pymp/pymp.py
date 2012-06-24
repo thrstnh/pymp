@@ -221,7 +221,7 @@ class PympGUI(QMainWindow):
 
     def update_statusbar(self, msg=''):
         if not msg:
-            msg = '{} tracks.'.format(self.plsPanel.model.length())
+            msg = '{} tracks.'.format(self.plsPanel.model.rowCount(None))
         logger.debug(':statusbar {}'.format(msg))
         self.statusBar().showMessage(msg)
 
@@ -262,7 +262,7 @@ class PympGUI(QMainWindow):
                                          self.trackInfo.update_env],
                 self.controlBar.togRepeat: [self._handle_repeat],
                 self.controlBar.togLyric: [self.toggleLyric],
-                self.controlBar.onShuffle: [self.plsPanel.model.shuffle],
+                self.controlBar.onShuffle: [self.plsPanel.model.shuffle_],
                 self.controlBar.onFocus: [self.plsPanel.select_playing],
                 self.controlBar.togMute: [self.player.mute],
                 self.controlBar.onVolume: [self.player.volume],
@@ -289,5 +289,5 @@ class PympGUI(QMainWindow):
                 self.searchBarCollection.timerExpired: [self.colPanel.usePattern],
                 # menuBar
                 self.actions['addCollection'].triggered: [self.colPanel.addCollection],
-                self.actions['shuffle'].triggered: [self.plsPanel.model.shuffle]}
+                self.actions['shuffle'].triggered: [self.plsPanel.model.shuffle_]}
         [map(signal.connect, slots) for signal, slots in self.connections.items()]

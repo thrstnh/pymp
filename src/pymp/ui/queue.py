@@ -20,11 +20,11 @@ class QueueDialog(QMainWindow):
         vbox = QVBoxLayout(self)
         self.searchBar = SearchBar(self, iconset['delete'],
                                    PYMPENV['SEARCH_TIMEOUT'])
-        self.tbl = myQTableView(self) #QTableView(self)
-        self.model = MyTableModel()
+        self.tbl = myQTableView(self)
+        self.model = MyTableModel(self)
         self.tbl.setModel(self.model)
+        self.tbl.set_model(self.model)
         self.tbl.setShowGrid(False)
-        self.tbl.setColumnHidden(0, True)
         vh = self.tbl.verticalHeader()
         vh.setVisible(False)
         vh.setDefaultSectionSize(14)
@@ -54,7 +54,7 @@ class QueueDialog(QMainWindow):
     def append(self, item):
         logger.info("queue append to model")
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self.model.append(item)
+        self.model.append_(item)
         self.emit(SIGNAL("layoutChanged()"))
 
     def onOk(self):

@@ -33,11 +33,10 @@ class PlaylistPanel(QWidget):
 
     def initUI(self):
         self.tbl = myQTableView(self)
-        self.model = MyTableModel()
+        self.model = MyTableModel(self)
         self.tbl.setModel(self.model)
+        self.tbl.set_model(self.model)
         self.tbl.setShowGrid(False)
-        self.tbl.setColumnHidden(0, True)
-        self.tbl.setColumnHidden(self.model.columnCount(None)-1, True)
         self.tbl.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tbl.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -48,7 +47,8 @@ class PlaylistPanel(QWidget):
         self.tbl.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.tbl.customContextMenuRequested.connect(self.popup)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+#        self.tbl.customContextMenuRequested.connect(self.popup)
         #self.tbl.setRowHeight()
         self.tbl.resizeRowsToContents()
         vh = self.tbl.verticalHeader()
@@ -59,25 +59,16 @@ class PlaylistPanel(QWidget):
         #vbox = QVBoxLayout(self)
         self.tbl.clicked.connect(self.clicked)
         self.tbl.doubleClicked.connect(self.double_clicked)
-        self.init_hdr()
         # TODO qt_layout decorator
 #        self.tbl.activated.connect(self.activated)
 #        self.tbl.entered.connect(self.entered)
 #        self.tbl.pressed.connect(self.pressed)
 
-    def init_hdr(self):
-        self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self.tbl.horizontalHeader().setStretchLastSection(True)
-        self.tbl.horizontalHeader().resizeSection(0, 60)
-        self.tbl.horizontalHeader().resizeSection(1, 180)
-        self.tbl.horizontalHeader().resizeSection(2, 180)
-        self.tbl.emit(SIGNAL("layoutChanged()"))
-
     def popup(self, point):
         if self._table_empty():
             return
         idx = self.tbl.selectionModel().currentIndex()
-        data = self.model.data_row(idx.row())
+        data = self.model.data_row_(idx.row())
 
         menu = QMenu()
         id3Action = menu.addAction('ID3 Editor')
@@ -100,7 +91,7 @@ class PlaylistPanel(QWidget):
             logger.info('unknown action (QTableView)')
 
     def clearPlaylist(self):
-        self.model.clear()
+        self.model.clear_()
 
     def search(self, pattern=''):
         tstart = time.time()
@@ -109,14 +100,13 @@ class PlaylistPanel(QWidget):
         else:
             pattern = unicode(pattern).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
-            self.model.clear()
+            self.model.clear_()
             self.tbl.emit(SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
-                if self.__valid_entry(v, map(unicode.strip, pattern), (1, 2, 3)):
+                if self.__valid_entry(v, map(unicode.strip, pattern), (4, 5, 7, 23)):
                     self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
                     self.tbl.emit(SIGNAL("layoutChanged()"))
-        self.init_hdr()
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.rowCount(None)))
         tdiff = time.time() - tstart
         self.filled.emit(tdiff)
@@ -150,15 +140,15 @@ class PlaylistPanel(QWidget):
         return all(br)
 
     def _get_path(self, row):
-        data = self.model.data_row(row)
+        data = self.model.data_row_(row)
         cpath = QString(data[len(data)-1])
         return cpath
 
     def _current_row(self):
-        return self.model.data_row(self._current_index)
+        return self.model.data_row_(self._current_index)
 
     def _current_row_selected(self):
-        return self.model.data_row(self._index_selected.row())
+        return self.model.data_row_(self._index_selected.row())
 
     def _random(self):
         if self._table_empty():
@@ -175,10 +165,10 @@ class PlaylistPanel(QWidget):
         return val
 
     def _row_valid(self, row):
-        if row >= self.model.length():
+        if row >= self.model.rowCount(None):
             return 0
         if row < 0:
-            return self.model.length() - 1
+            return self.model.rowCount(None) - 1
         return row
 
     def _change_index(self, row, signal, append_history=True):
@@ -215,7 +205,7 @@ class PlaylistPanel(QWidget):
         else:
             self._history_level -= 1
             last = self._history[self._history_level]
-            row = self.model.row_id(last)
+            row = self.model.row_id_(last)
             if row:
                 self._current_index = row
                 self._change_index(self._current_index, self.playPrev, False)
@@ -228,7 +218,7 @@ class PlaylistPanel(QWidget):
         if not self.queue_empty():
             qitem = self._queue.pop(0)
             logger.debug(':queue {}'.format(qitem))
-            row = self.model.row_id(qitem)
+            row = self.model.row_id_(qitem)
             if row:
                 self._current_index = row
                 self._change_index(self._current_index, self.playNext, False)
@@ -237,14 +227,13 @@ class PlaylistPanel(QWidget):
             self._current_index = self._random()
         else:
             self._current_index += 1
-            if self._current_index > self.model.length():
+            if self._current_index > self.model.rowCount(None):
                 self._current_index = 0
         return self._change_index(self._current_index, self.playNext)
 
     def _table_empty(self):
-        empty = self.model.length() == 0
+        empty = self.model.rowCount(None) == 0
         if not empty:
-            self.tbl.selectRow(1)
             self._index_playing = self.tbl.currentIndex()
         return empty
 
@@ -283,11 +272,15 @@ class PlaylistPanel(QWidget):
 #    def pressed(self, val1, val2):
 #        raise NotImplementedError
     def append(self, item):
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.tracks[item[-1]] = item
-        self.model.append(item)
+        self.tbl.append(item)
+        self.emit(SIGNAL("layoutChanged()"))
 
     def appendModel(self, item):
-        self.model.append(item)
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.tbl.append(item)
+        self.emit(SIGNAL("layoutChanged()"))
 
     def enqueue_track(self):
         cr = self._current_row_selected()

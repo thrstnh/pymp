@@ -1,4 +1,5 @@
 import os
+import operator
 import pymp.sqldb
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -6,8 +7,24 @@ from cPickle import dumps, load, loads
 from cStringIO import StringIO
 from copy import deepcopy
 from ..collection import Collections
+from ..config import TABLE
+from ..logger import init_logger
 
-__all__ = ["myModel"]
+__all__ = ['myModel', 'MyTree']
+
+logger = init_logger()
+
+
+class MyTree(QTreeView):
+
+    def __init__(self, parent, *args, **kw):
+        QTreeView.__init__(self, parent, *args, **kw)
+
+    def set_model(self, model):
+        self.model = model
+
+    def reload(self):
+        self.model.reload()
 
 
 class PyMimeData(QMimeData):
@@ -137,7 +154,9 @@ class myModel(QAbstractItemModel):
         self.headers = ['Item', 'State', 'type']
         self.pattern = ''
         self._init_collection()
-
+        order = operator.itemgetter(2)
+        stable = sorted(TABLE, key=order)
+        self.header_keys = self._extract(0, stable)
         self.columns = 3
         # Create items
         self._load(self.pattern)
@@ -296,6 +315,23 @@ class myModel(QAbstractItemModel):
     def nodeFromIndex(self, index):
         return index.internalPointer() if index.isValid() else self.root
 
+    def _extract(self, key, table):
+        return [item[key] for item in table]
+
+    def _init_item(self, row):
+        ret = []
+        for k in self.header_keys:
+            key = k.lower()
+            if key in row:
+                ret.append(row[key])
+            else:
+                ret.append('')
+        return ret
+
+    def reload(self):
+        logger.debug(':tree.reload')
+        self._load()
+
     def _load(self, pattern=''):
         '''
         self.root = myNode('root', 'on', 'this is root', 'ROOT', None)
@@ -339,8 +375,7 @@ class myModel(QAbstractItemModel):
                         title = '%s' % val['tit2']
                 else:
                     title = ''
-                path = [val['tid'], val['tit2'], val['tpe1'], val['talb'], val['tcon'],
-                    val['tdrc'], val['tlen'], val['trck'], val['path']]
+                path = self._init_item(val)
 
                 if not val['hid3']:
                     h, t = os.path.split(val['path'])

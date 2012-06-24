@@ -4,7 +4,7 @@ import sqlite3
 import time
 import os.path
 from PyQt4 import QtCore
-from .config import init_env, TABLE_OPTIONS
+from .config import init_env
 from .logger import init_logger
 
 PYMPENV = init_env()
@@ -336,12 +336,12 @@ def _format_time(t):
         h,m = divmod(m, 60)
         return "%i:%02i:%02i" %(h,m,s)
 
-def _init_tbl_columns():
-    columns = []
-    for k,v in TABLE_OPTIONS.items():
-        if v[0]:
-            columns.append((v[1], k))
-    return [hdr for (id,hdr) in sorted(columns)]
+#def _init_tbl_columns():
+#    columns = []
+#    for k,v in TABLE_OPTIONS.items():
+#        if v[0]:
+#            columns.append((v[1], k))
+#    return [hdr for (id,hdr) in sorted(columns)]
 
 def lfm_user(username='', md5password='', login=False, scrobble=False):
     ret = {}

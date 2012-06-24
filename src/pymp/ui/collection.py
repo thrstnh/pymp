@@ -4,7 +4,7 @@ from PyQt4.QtCore import *
 from pymp import sqldb
 from pymp.collection import Collection
 from ..logger import init_logger
-from ..model.tree import myModel
+from ..model.tree import myModel, MyTree
 
 logger = init_logger()
 
@@ -22,8 +22,9 @@ class CollectionPanel(QWidget):
 
     def initUI(self):
         ''' TODO: init user interface '''
-        self.tre = QTreeView(self)
-        self.model = myModel()
+        self.tre = MyTree(self)
+        self.model = myModel(self)
+        self.tre.set_model(self.model)
         self.tre.setModel(self.model)
         self.tre.setDragDropMode(QAbstractItemView.InternalMove)
         self.tre.dragEnabled()
@@ -127,7 +128,7 @@ class CollectionPanel(QWidget):
                                     self.deleteCollection))
         popMenu.addAction(
                     toolb.addAction('reload',
-                                    self.initUI))
+                                    self.tre.reload))
         popMenu.exec_(self.tre.mapToGlobal(point))
 
     def addCollection(self):
@@ -144,6 +145,7 @@ class CollectionPanel(QWidget):
         sqldb.init_collections(col)
         c = Collection(cname,path)
         c.rescan()
+        self.tre.reload()
 
     def rescanCollection(self):
         logger.info('collection:rescan: {}'.format(self.current_collection_name))
@@ -156,3 +158,4 @@ class CollectionPanel(QWidget):
     def deleteCollection(self):
         logger.info('collection:delete: {}'.format(self.current_collection_name))
         self.model.collection_delete(self.current_collection_name)
+        self.tre.reload()

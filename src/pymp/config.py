@@ -1,6 +1,4 @@
 import sys
-import os
-import os.path
 import copy
 import json
 from os.path import expanduser
@@ -66,8 +64,8 @@ class PympEnv(PropertyDict):
         self['DIR_ROOT'] = ROOT_DIR
         self['DIR_LOG'] = join(ROOT_DIR, 'log')
         self['DIR_LYRICS'] = join(ROOT_DIR, 'lyrics')
-        self['RANDOM'] = True
-        self['REPEAT'] = False
+        self['RANDOM'] = False
+        self['REPEAT'] = True
         self['MUTE'] = False
         self['SHOW_LYRIC'] = True
         self['SHOW_COLLECTION'] = True
@@ -145,44 +143,31 @@ logger.debug(':env\n{}'.format('\n'.join(
                 ['    {:20} -> {}'.format(k, v)
                     for k,v in PYMPENV.items()])))
 
-
-class Entry(PropertyDict):
-
-    _VALID_KEYS = set(['SHOW', 'ROW', 'KEY', 'NAME', 'WIDTH'])
-
-    def __init__(self, show, row, name, width):
-        super(Entry, self).__init__()
-        self['SHOW'] = show
-        self['ROW'] = row
-        self['NAME'] = name
-        self['WIDTH'] = width
-
-    @property
-    def show(self):
-        return self['SHOW']
-
-    @property
-    def row(self):
-        return self['ROW']
-
-    @property
-    def name(self):
-        return self['NAME']
-
-    @property
-    def width(self):
-        return self['WIDTH']
-
-
-class TableProperties(dict):
-
-    def __init__(self):
-        super(TableProperties, self).__init__()
-
-    def set_options(self, options={}):
-        # id = (SHOW, ROW, NAME, WIDTH)
-        for (k,v) in options.items():
-            self[k] = Entry(*v)
+TABLE = [('ID', False, 10, 'ID', 0),
+         ('HID3', False, 25, 'hasid3', 50),
+         ('TPE2', False, 30, 'Band', 180),
+         ('TPE1', True, 35, 'Artist', 170),
+         ('TIT1', False, 50, 'Content Group', 120),
+         ('TIT2', True, 40, 'Titel', 170),
+         ('TALB', True, 70, 'Album', 170),
+         ('TLEN', True, 42, 'Length', 50),
+         ('TDRC', True, 77, 'Year', 60),
+         ('TRCK', True, 76, 'TrackNo', 60),
+         ('TENC', False, 110, 'Encoded by', 120),
+         ('TFLT', False, 120, 'FileType', 120),
+         ('TDRL', False, 130, 'ReleaseTime', 120),
+         ('TLAN', False, 140, 'Language', 120),
+         ('TPUB', False, 150, 'Publisher', 120),
+         ('TCOP', False, 160, 'Copyright', 120),
+         ('TCON', True, 75, 'Genre', 120),
+         ('TCOM', False, 180, 'Composer', 120),
+         ('TSSE', False, 190, 'Encoding', 120),
+         ('TDTG', False, 200, 'TaggingTime', 120),
+         ('TBPM', False, 210, 'BPM', 120),
+         ('TPOS', False, 220, 'PartOfSet', 120),
+         ('BITR', False, 230, 'Bitrate', 120),
+         # always hidden/last and las, just4coding
+         ('PATH', False, 999, 'PATH', 600)]
 
 
 TABLE_OPTIONS = {
@@ -211,14 +196,3 @@ TABLE_OPTIONS = {
         'BITR':   (False, 230, 'Bitrate', 120),
     # always hidden/last and las, just4coding
         'PATH':   (True, 999, 'PATH', 600)}
-
-
-def init_table():
-    global TABLE_PROP
-    if not TABLE_PROP:
-        logger.info('init_table')
-        TABLE_PROP = TableProperties()
-        TABLE_PROP.set_options(TABLE_OPTIONS)
-    return TABLE_PROP
-
-TABLE_PROP = init_table()
