@@ -96,18 +96,17 @@ class PlaylistPanel(QWidget):
 
     def search(self, pattern=''):
         tstart = time.time()
+        pattern = unicode(pattern).lower().split()
+        pattern = [p for p in pattern if len(p) > 2]
         if not pattern:
             self.model.set_data_(self._track_list)
         else:
-            pattern = unicode(pattern).lower().split()
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear_()
-            self.tbl.emit(SIGNAL("layoutChanged()"))
             for (k, v) in self.tracks.items():
                 if self.__valid_entry(v, map(unicode.strip, pattern), (4, 5, 7, 23)):
-                    self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
                     self.appendModel(v)
-                    self.tbl.emit(SIGNAL("layoutChanged()"))
+            self.tbl.emit(SIGNAL("layoutChanged()"))
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.rowCount(None)))
         tdiff = time.time() - tstart
         self.filled.emit(tdiff)
