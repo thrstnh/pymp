@@ -106,7 +106,7 @@ class PlaylistPanel(QWidget):
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear_()
             for (k, v) in self.tracks.items():
-                if self._match(v, pattern, rows, mor):
+                if self._match(v, pattern, rows, mode_or=mor):
                     self.appendModel(v)
             self.tbl.emit(SIGNAL("layoutChanged()"))
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.rowCount(None)))
@@ -114,7 +114,7 @@ class PlaylistPanel(QWidget):
         self.filled.emit(tdiff)
         logger.info(':fill {}s'.format(tdiff))
 
-    def _match(self, item, pattern=[], keys=[], case_sensitive=False, mor=False):
+    def _match(self, item, pattern=[], keys=[], case_sensitive=False, mode_or=False):
         r'''example:
                 item = ['Tenacious D', 'Tribute', 'Homemade', 'Rock']
                 pattern = ['tenac', 'rock']
@@ -127,9 +127,7 @@ class PlaylistPanel(QWidget):
             pattern = map(unicode.lower, pattern)
         for p in pattern:
             br.append(any([p in item[k] for k in keys]))
-        if mor:
-            return any(br)
-        return all(br)
+        return any(br) if mode_or else all(br)
 
     def _get_path(self, row):
         data = self.model.data_row_(row)
