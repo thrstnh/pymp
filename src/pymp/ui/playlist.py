@@ -96,7 +96,9 @@ class PlaylistPanel(QWidget):
 
     def search(self, pattern=''):
         tstart = time.time()
-        pattern = unicode(pattern).lower().split()
+        pattern = map(unicode.strip, unicode(pattern).split())
+        mor = 'or' in pattern
+        rows = (4, 5, 7, 23)
         pattern = [p for p in pattern if len(p) > 2]
         if not pattern:
             self.model.set_data_(self._track_list)
@@ -104,7 +106,7 @@ class PlaylistPanel(QWidget):
             self.tbl.emit(SIGNAL("layoutAboutToBeChanged()"))
             self.model.clear_()
             for (k, v) in self.tracks.items():
-                if self.__valid_entry(v, map(unicode.strip, pattern), (4, 5, 7, 23)):
+                if self._match(v, pattern, rows, mor):
                     self.appendModel(v)
             self.tbl.emit(SIGNAL("layoutChanged()"))
         self.parent.statusBar().showMessage('%s Tracks' % (self.model.rowCount(None)))
@@ -112,27 +114,17 @@ class PlaylistPanel(QWidget):
         self.filled.emit(tdiff)
         logger.info(':fill {}s'.format(tdiff))
 
-    def __valid_entry(self, item, pattern=[], keys=[], case_sensitive=False):
+    def _match(self, item, pattern=[], keys=[], case_sensitive=False, mor=False):
         r'''example:
                 item = ['Tenacious D', 'Tribute', 'Homemade', 'Rock']
                 pattern = ['tenac', 'rock']
                 keys = (0, 3)
                 # would match every pattern in item with given index
         '''
+        br = []
         if not case_sensitive:
             item = [s.lower() if isinstance(s, basestring) else s for s in item]
             pattern = map(unicode.lower, pattern)
-        # mode: or
-        mor = True if 'or' in pattern else False
-        # mode: and
-        mand = True if 'and' in pattern else False
-        if mor:
-            while pattern.count('or') > 0:
-                pattern.remove('or')
-        if mand:
-            while pattern.count('and') > 0:
-                pattern.remove('and')
-        br = []
         for p in pattern:
             br.append(any([p in item[k] for k in keys]))
         if mor:
