@@ -99,7 +99,7 @@ class PlaylistPanel(QWidget):
         pattern = map(unicode.strip, unicode(pattern).split())
         mor = 'or' in pattern
         rows = (4, 5, 7, 23)
-        pattern = [p for p in pattern if len(p) > 2]
+        pattern = filter(lambda p: len(p) >= PYMPENV['SEARCH_MIN_LENGTH'], pattern)
         if not pattern:
             self.model.set_data_(self._track_list)
         else:
@@ -121,13 +121,11 @@ class PlaylistPanel(QWidget):
                 keys = (0, 3)
                 # would match every pattern in item with given index
         '''
-        br = []
         if not case_sensitive:
             item = [s.lower() if isinstance(s, basestring) else s for s in item]
             pattern = map(unicode.lower, pattern)
-        for p in pattern:
-            br.append(any([p in item[k] for k in keys]))
-        return any(br) if mode_or else all(br)
+        b = map(lambda p: any([p in item[k] for k in keys]), pattern)
+        return any(b) if mode_or else all(b)
 
     def _get_path(self, row):
         data = self.model.data_row_(row)

@@ -45,7 +45,7 @@ class PympEnv(PropertyDict):
             'DROP_ID',
             'ICONSET',
             'USE_SQL', 'FAST_CLIENT', 'AUTO_FOCUS',
-            'SEARCH_TIMEOUT',
+            'SEARCH_TIMEOUT', 'SEARCH_MIN_LENGTH',
             'VOLUME',
             'TAG_UPDATE'])
 
@@ -83,7 +83,8 @@ class PympEnv(PropertyDict):
         self['VOLUME'] = 75
         # focus track on next play
         self['AUTO_FOCUS'] = True
-        self['SEARCH_TIMEOUT'] = 500
+        self['SEARCH_TIMEOUT'] = 750
+        self['SEARCH_MIN_LENGTH'] = 3
         # this is an option for collection rescan,
         # if it is True, the rescan of a collection
         # also checks for new or updated id3-tags,
